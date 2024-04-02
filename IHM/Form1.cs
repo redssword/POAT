@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Traitement;
 
 namespace IHM
 {
@@ -26,7 +27,9 @@ namespace IHM
 
                 var strings = ofdImg.FileName.Split('\\');
 
+                CImageNdgCS cImageNdgCS = new CImageNdgCS(ofdImg.FileName);
 
+                int i = 0;
 
             }
         }
