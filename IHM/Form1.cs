@@ -16,5 +16,10 @@ namespace IHM
         {
             InitializeComponent();
         }
+
+        private void btImg_Click(object sender, EventArgs e)
+        {
+            ofdImg.ShowDialog();
+        }
     }
 }
