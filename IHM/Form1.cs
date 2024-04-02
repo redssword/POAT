@@ -19,7 +19,16 @@ namespace IHM
 
         private void btImg_Click(object sender, EventArgs e)
         {
-            ofdImg.ShowDialog();
+            if (ofdImg.ShowDialog() == DialogResult.OK)
+            {
+                var bmp = new Bitmap(ofdImg.FileName);
+                pBImgRef.Image = bmp;
+
+                var strings = ofdImg.FileName.Split('\\');
+
+
+
+            }
         }
     }
 }
