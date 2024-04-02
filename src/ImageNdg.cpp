@@ -845,3 +845,15 @@ CImageNdg CImageNdg::hough(int threshold, bool colorForEachLine)
 
 	return res;
 }
+
+
+// Fonctions d'exportation
+extern "C" {
+	__declspec(dllexport) CImageNdg* CreerCImageNdg(const std::string nom) {
+		return new CImageNdg(nom);
+	}
+
+	__declspec(dllexport) void DetruireCImageNdg(CImageNdg* instance) {
+		delete instance;
+	}
+}
