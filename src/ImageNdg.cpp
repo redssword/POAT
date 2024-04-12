@@ -6,6 +6,7 @@
 
 #include "ImageNdg.h"
 #include "ImageDouble.h"
+#include "ImageClasse.h"
 
 const double PI = 3.14159265358979323846;
 // constructeurs et destructeur
@@ -846,8 +847,161 @@ CImageNdg CImageNdg::hough(int threshold, bool colorForEachLine)
 	return res;
 }
 
+float CImageNdg::IOU(CImageNdg Image1, CImageNdg Image2)
+{
+	//Lexique local
+	int inter_area = 0;
+	int union_area = 0;
+	float iou;
+
+	// Parcours de chaque pixel
+	for (int i = 0; i < Image1.lireHauteur(); i++) {
+		for (int j = 0; j < Image1.lireLargeur(); j++) {
+			if (Image1(i, j) == 255 && Image2(i, j) == 255)
+			{
+				inter_area++;
+			}
+			if (Image1(i, j) == 255 || Image2(i, j) == 255) {
+				union_area++;
+			}
+		}
+	}
+
+	iou = (float)(inter_area) / union_area;
+	return iou;
+}
+
+/*
+double CImageNdg::hausdorffDistance(CImageNdg Image1, CImageNdg Image2)
+{
+	int nbComp_img1 = 0, nbComp_img2 = 0;//Segmenter img1 : algo  (stocker)
+	CImageClasse im_seg(Image1.seuillage("otsu"), "V8");
+	CImageNdg img_label1 = im_seg.toNdg("expension");
+	//Segmenter img2 : truth (stocker)
+	CImageClasse im_seg(Image1.seuillage("otsu"), "V8");
+	CImageNdg img_label1 = im_seg.toNdg("expension");
+	// Compter nombre d'élément dans img2 : truth
+	// le total d'éleemnt à trouver est le nombre d'élément de img2 : truth
+	// calcul les centre de gravité des élements de img2 et de img1
+	std::vector<SIGNATURE_Ndg> sig_img1(img_label1, false);
+	SIGNATURE_COMPOSANTE_CONNEXE* sig_img1 = (SIGNATURE_COMPOSANTE_CONNEXE*)calloc(nbComp_img1 + 1, sizeof(SIGNATURE_COMPOSANTE_CONNEXE));
+	SIGNATURE_COMPOSANTE_CONNEXE* sig_img2 = (SIGNATURE_COMPOSANTE_CONNEXE*)calloc(nbComp_img2 + 1, sizeof(SIGNATURE_COMPOSANTE_CONNEXE));
+	sig_img1 = signaturesImage(labelimg1, nbComp_img1);
+	sig_img2 = signaturesImage(labelimg2, nbComp_img2);
+	// Pour chaque élement dans img2
+	//		trouver le centre de gravité dans img1 le plus proche de l'élément dans img2
+	//		Associer l'élément de img2 avec l'élément de img1 le plus proche
+	double minDistCentre = INFINITY;
+	int* tab_index2to1 = (int*)malloc(nbComp_img2 * sizeof(int));
+	int x_distCentre;
+	int y_distCentre;
+	float euclDist_Centre;
+	double d_hausdorff = 0;
+	double MAX_DISTANCE = 0;
+
+	for (int k = 0; k < nbComp_img2; k++)
+	{
+		for (int l = 0; l < nbComp_img1; l++)
+		{
+			x_distCentre = abs((sig_img1[l].CG.abscisse) - (sig_img2[k].CG.abscisse));
+			y_distCentre = abs((sig_img1[l].CG.ordonnee) - (sig_img2[k].CG.ordonnee));
+			euclDist_Centre = sqrt(x_distCentre * x_distCentre + y_distCentre * y_distCentre);
+			if (euclDist_Centre < minDistCentre)
+			{
+				minDistCentre = euclDist_Centre;
+				tab_index2to1[k] = l; //object 'k' from img2 <=> object 'l' from img1
+			}
+		}
+		//printf("tab_index2to1[%d] : %d \n", k, tab_index2to1[k]);
+
+
+		double maxDistAB = 0.0;  // Distance maximale entre un point de A et le plus proche point de B
+		double maxDistBA = 0.0;  // Distance maximale entre un point de B et le plus proche point de A
+
+		for (int y1 = 0; y1 < labelimg1.Nblig; y1++)
+		{
+			for (int x1 = 0; x1 < labelimg1.Nbcol; x1++)
+			{
+				if (labelimg1.pixel[y1][x1] == tab_index2to1[k] + 1) // object 'l'
+				{  // Point de l'ensemble A trouvé
+					double minDistB = INFINITY;  // Distance minimale entre un point de A et B
+
+					for (int y2 = 0; y2 < labelimg2.Nblig; y2++)
+					{
+						for (int x2 = 0; x2 < labelimg2.Nbcol; x2++)
+						{
+							if (labelimg2.pixel[y2][x2] == k + 1) // object 'k'
+							{  // Point de l'ensemble B trouvé
+								double dist = euclideanDistance(x1, y1, x2, y2);
+								if (dist < minDistB)
+								{
+									minDistB = dist;
+								}
+							}
+						}
+					}
+
+					if (minDistB > maxDistAB)
+					{
+						maxDistAB = minDistB;
+					}
+				}
+			}
+		}
+
+		for (int y2 = 0; y2 < labelimg1.Nblig; y2++)
+		{
+			for (int x2 = 0; x2 < labelimg1.Nbcol; x2++)
+			{
+				if (labelimg2.pixel[y2][x2] == k + 1) //object 'k'
+				{  // Point de l'ensemble B trouvé
+					double minDistA = INFINITY;  // Distance minimale entre un point de B et A
+
+					for (int y1 = 0; y1 < labelimg1.Nblig; y1++)
+					{
+						for (int x1 = 0; x1 < labelimg1.Nbcol; x1++)
+						{
+							if (labelimg1.pixel[y1][x1] == tab_index2to1[k] + 1) //object 'l'
+							{  // Point de l'ensemble A trouvé
+								double dist = euclideanDistance(x2, y2, x1, y1);
+								if (dist < minDistA)
+								{
+									minDistA = dist;
+								}
+							}
+						}
+					}
+
+					if (minDistA > maxDistBA)
+					{
+						maxDistBA = minDistA;
+					}
+				}
+			}
+		}
+		d_hausdorff += fmax(maxDistAB, maxDistBA);
+	}
+	d_hausdorff /= nbComp_img2;
+
+	MAX_DISTANCE = sqrt(img1.Nbcol * img1.Nbcol + img1.Nblig * img1.Nblig);
+	if (d_hausdorff <= 0.0)
+	{
+		return 1.0;
+	}
+	else if (d_hausdorff >= MAX_DISTANCE)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1.0 - (d_hausdorff / MAX_DISTANCE);
+	}
+
+}
+*/
 
 // Fonctions d'exportation
+
 extern "C" {
 	__declspec(dllexport) CImageNdg* CreerCImageNdg(const std::string nom) {
 		return new CImageNdg(nom);
