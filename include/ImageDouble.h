@@ -32,7 +32,7 @@ class CImageDouble {
 		// constructeurs
 		_declspec(dllexport) CImageDouble(); // par défaut
 		_declspec(dllexport) CImageDouble(int hauteur, int largeur); // initialisation à 0
-		_declspec(dllexport) CImageDouble(const CImageNdg& im, const std::string& methode = "cast");  // choix "normalise"/"cast"/"integrale1"/"integrale2"
+		_declspec(dllexport) CImageDouble(const CImageNdg& im, const std::string& methode = "normalise");  // choix "normalise"/"cast"/"integrale1"/"integrale2"
 		// image Ndg en entrée
 		_declspec(dllexport) CImageDouble(const CImageDouble& im); // image en entrée
 
@@ -98,30 +98,24 @@ class CImageDouble {
 		return m_iHauteur*m_iLargeur;
 		}
 
+		// seuillage manuel uniquement
+		_declspec(dllexport) CImageDouble seuillage(double seuilBas = 0, double seuilHaut = 1);
+
 		// distance au fond
 		_declspec(dllexport) CImageDouble distance(std::string eltStructurant = "V8", double valBord = 0);
 
-		// conversions 
+		// conversions !!!
 		_declspec(dllexport) CImageNdg toNdg(const std::string& methode = "defaut"); // choix "defaut"/"expansion"
+
+		// Hough Transform
+		_declspec(dllexport) CImageDouble planHough();
+		_declspec(dllexport) CImageDouble maxiLocaux(int N = 9, int M = 9) const;
+		_declspec(dllexport) CImageDouble extractionLignes(int N=9, int M=9, double dimLigne=50, bool affichage="true");
+		_declspec(dllexport) CImageNdg    houghInverse(const CImageNdg& img); 
 
 		// Vecteur gradient
 		_declspec(dllexport) CImageDouble vecteurGradient(const std::string& axe = "norme"); // choix "norme"/"angle"
 
-		// Filtrage : moyen/gaussien
-		_declspec(dllexport) CImageDouble filtrage(const std::string& methode = "moyen", int N = 3, double sigma = 0.5);
-
-		// pyramides
-		_declspec(dllexport) std::vector<CImageDouble> pyramide(int hauteur = 5, int tailleFiltre = 5, double sigma = 1);
-
-		double moyenneLocale(const CImageDouble& img, int i1, int j1, int i2, int j2);
-
-		double ecartTypeLocal(const CImageDouble& integrale1, const CImageDouble& integrale2, int i1, int j1, int i2, int j2);
-
-		CImageNdg moyennesLocale(const CImageNdg& img, int X, int Y);
-
-		CImageNdg ecartTypeLocaux(const CImageNdg& img, int X, int Y);
-
-		CImageNdg maximumLocaux(void);
 };
 
 #endif 
