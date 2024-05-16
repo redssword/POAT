@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,12 +27,32 @@ namespace IHM
                 pBImgRef.Image = bmp;
 
                 var strings = ofdImg.FileName.Split('\\');
+                var GroungTruthPath = strings[0] + "\\";
+                for (int i = 1;  i < strings.Length-2; i++)
+                {
+                    GroungTruthPath = Path.Combine(GroungTruthPath, strings[i]);
+                }
 
-                CImageNdgCS cImageNdgCS = new CImageNdgCS(ofdImg.FileName);
+                GroungTruthPath = Path.Combine(GroungTruthPath, "Ground truth - png");
+                var extesion = strings[strings.Length - 1].Split('.');
+                var newextention = extesion[0] + ".png";
+                GroungTruthPath = Path.Combine(GroungTruthPath, newextention);
 
-                int i = 0;
+                var GroundTruth = new Bitmap (GroungTruthPath);
+                pBVerite.Image = GroundTruth;
+
+                
 
             }
+        }
+
+        private void btnTraitement_Click(object sender, EventArgs e)
+        {
+            
+            pbRes.Image = pBImgRef.Image;
+            CImageNdgCS obj = new CImageNdgCS();
+            obj.CreerCImageNdgCs(ofdImg.FileName);
+            //Comprendre les parametres à envoyer à la dll
         }
     }
 }

@@ -10,21 +10,28 @@ namespace Traitement
     public class CImageNdgCS
     {
 
-        private IntPtr m_instance;
+        public IntPtr m_instance;
 
         [DllImport("Traitement.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr CreerCImageNdg(string param);
 
+        public IntPtr CreerCImageNdgCs(string param)
+        {
+            m_instance = CreerCImageNdg(param); 
+            return m_instance;
+        }
+
+
         [DllImport("Traitement.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void DetruireCImageNdg(IntPtr instance);
 
-        public CImageNdgCS(string param)
+        public CImageNdgCS()
         {
-            m_instance = CreerCImageNdg(param);
-            if (m_instance == IntPtr.Zero)
-            {
-                throw new Exception("Impossible de créer l'instance de CImageNdg.");
-            }
+            m_instance = IntPtr.Zero; //CreerCImageNdg(param);
+            //if (m_instance == IntPtr.Zero)
+            //{
+            //    throw new Exception("Impossible de créer l'instance de CImageNdg.");
+            //}
         }
 
         ~CImageNdgCS()
