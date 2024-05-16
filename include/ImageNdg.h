@@ -252,8 +252,11 @@ public:
 	// élément structurant options : "V4" ou "V8"
 	_declspec(dllexport) CImageNdg morphologie(const std::string methode = "dilatation", const std::string eltStructurant = "V8");
 
-	CImageNdg hough(int threshold = 140, bool diffLine = false);
+	_declspec(dllexport) CImageNdg hough(int threshold = 140, bool diffLine = false);
+	
+	_declspec(dllexport) float IOU(CImageNdg Image1, CImageNdg Image2);
 
+	_declspec(dllexport) double hausdorffDistance(CImageNdg Image1, CImageNdg Image2);
 };
 
 #endif _IMAGE_NDG_
