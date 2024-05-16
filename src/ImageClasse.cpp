@@ -650,6 +650,35 @@ CImageClasse::~CImageClasse() {
 	}
 }
 
+CImageNdg CImageClasse::toNdg(const std::string& methode) {
+
+	CImageNdg out(this->lireHauteur(), this->lireLargeur());
+	out.ecrireBinaire(false);
+	out.choixPalette("grise");
+	out.ecrireNom(this->lireNom() + "2NDG");
+
+	if (methode.compare("defaut") == 0) {
+		for (int i = 0; i < this->lireNbPixels(); i++)
+			if (this->operator()(i) < 0)
+				out(i) = 0;
+			else
+				if (this->operator()(i) > 256)
+					out(i) = 255;
+				else
+					out(i) = (unsigned char)this->operator()(i);
+	}
+	else
+		if (methode.compare("expansion") == 0) {
+			double a = 255 / (255 - 0);
+			double b = -a * 0;
+
+			for (int i = 0; i < this->lireNbPixels(); i++)
+				out(i) = (unsigned char)(a * this->operator()(i) + b);
+		}
+
+	return(out);
+}
+
 void CImageClasse::sauvegarde(const std::string& file) {
 	std::string nomFichier = "";
 

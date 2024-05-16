@@ -23,12 +23,14 @@
     <ClCompile Include="..\src\ImageCouleur.cpp" />
     <ClCompile Include="..\src\ImageDouble.cpp" />
     <ClCompile Include="..\src\ImageNdg.cpp" />
+    <ClCompile Include="Wrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\ImageClasse.h" />
     <ClInclude Include="..\include\ImageCouleur.h" />
     <ClInclude Include="..\include\ImageDouble.h" />
     <ClInclude Include="..\include\ImageNdg.h" />
+    <ClInclude Include="Wrapper.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
