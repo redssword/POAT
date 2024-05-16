@@ -1003,8 +1003,9 @@ double CImageNdg::hausdorffDistance(CImageNdg Image1, CImageNdg Image2)
 // Fonctions d'exportation
 
 extern "C" {
-	__declspec(dllexport) CImageNdg* CreerCImageNdg(const std::string nom) {
-		return new CImageNdg(nom);
+	__declspec(dllexport) CImageNdg* CreerCImageNdg(const char *nom) {
+		CImageNdg* img = new CImageNdg(nom);
+		return img;
 	}
 
 	__declspec(dllexport) void DetruireCImageNdg(CImageNdg* instance) {
