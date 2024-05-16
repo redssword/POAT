@@ -69,6 +69,8 @@ class CImageClasse {
 
 		_declspec(dllexport) ~CImageClasse(); // destructeur
 
+		_declspec(dllexport) CImageNdg toNdg(const std::string& methode = "defaut");
+
 		// sauvegarde au format bmp
 		// attention : cast des informations car pertes potentielles
 		_declspec(dllexport) void sauvegarde(const std::string& file = ""); // sauvegarde data au format BMP avec cast des long en char
