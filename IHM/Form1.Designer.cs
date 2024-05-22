@@ -45,11 +45,13 @@
 			this.ofdImg = new System.Windows.Forms.OpenFileDialog();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.fichierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.imageUniqueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.dossierDimageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tratementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.méthodToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.distanceDeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.imageUniqueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.dossierDimageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.FBDDir = new System.Windows.Forms.FolderBrowserDialog();
+			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
 			((System.ComponentModel.ISupportInitialize)(this.pBImgRef)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pBVerite)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbRes)).BeginInit();
@@ -62,6 +64,7 @@
 			this.pBImgRef.Location = new System.Drawing.Point(12, 68);
 			this.pBImgRef.Name = "pBImgRef";
 			this.pBImgRef.Size = new System.Drawing.Size(300, 280);
+			this.pBImgRef.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.pBImgRef.TabIndex = 0;
 			this.pBImgRef.TabStop = false;
 			// 
@@ -89,6 +92,7 @@
 			this.pBVerite.Location = new System.Drawing.Point(12, 469);
 			this.pBVerite.Name = "pBVerite";
 			this.pBVerite.Size = new System.Drawing.Size(300, 280);
+			this.pBVerite.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.pBVerite.TabIndex = 2;
 			this.pBVerite.TabStop = false;
 			// 
@@ -108,6 +112,7 @@
 			this.pbRes.Location = new System.Drawing.Point(490, 68);
 			this.pbRes.Name = "pbRes";
 			this.pbRes.Size = new System.Drawing.Size(300, 280);
+			this.pbRes.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.pbRes.TabIndex = 5;
 			this.pbRes.TabStop = false;
 			// 
@@ -204,6 +209,20 @@
 			this.fichierToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
 			this.fichierToolStripMenuItem.Text = "Fichier";
 			// 
+			// imageUniqueToolStripMenuItem
+			// 
+			this.imageUniqueToolStripMenuItem.Name = "imageUniqueToolStripMenuItem";
+			this.imageUniqueToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.imageUniqueToolStripMenuItem.Text = "Image Unique";
+			this.imageUniqueToolStripMenuItem.Click += new System.EventHandler(this.imageUniqueToolStripMenuItem_Click);
+			// 
+			// dossierDimageToolStripMenuItem
+			// 
+			this.dossierDimageToolStripMenuItem.Name = "dossierDimageToolStripMenuItem";
+			this.dossierDimageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.dossierDimageToolStripMenuItem.Text = "Dossier d\'image";
+			this.dossierDimageToolStripMenuItem.Click += new System.EventHandler(this.dossierDimageToolStripMenuItem_Click);
+			// 
 			// tratementToolStripMenuItem
 			// 
 			this.tratementToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -224,19 +243,6 @@
 			this.distanceDeToolStripMenuItem.Name = "distanceDeToolStripMenuItem";
 			this.distanceDeToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
 			this.distanceDeToolStripMenuItem.Text = "Distance de Hausdorff";
-			// 
-			// imageUniqueToolStripMenuItem
-			// 
-			this.imageUniqueToolStripMenuItem.Name = "imageUniqueToolStripMenuItem";
-			this.imageUniqueToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.imageUniqueToolStripMenuItem.Text = "Image Unique";
-			this.imageUniqueToolStripMenuItem.Click += new System.EventHandler(this.imageUniqueToolStripMenuItem_Click);
-			// 
-			// dossierDimageToolStripMenuItem
-			// 
-			this.dossierDimageToolStripMenuItem.Name = "dossierDimageToolStripMenuItem";
-			this.dossierDimageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.dossierDimageToolStripMenuItem.Text = "Dossier d\'image";
 			// 
 			// Form1
 			// 
@@ -295,6 +301,8 @@
 		private System.Windows.Forms.ToolStripMenuItem distanceDeToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem imageUniqueToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem dossierDimageToolStripMenuItem;
+		private System.Windows.Forms.FolderBrowserDialog FBDDir;
+		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
 	}
 }
 

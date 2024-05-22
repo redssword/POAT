@@ -91,16 +91,16 @@ namespace Traitement
 			return ClPtr;
 		}
 
-		[DllImport("libImage.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("Traitement.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr objetLibDataImg(int nbChamps, IntPtr data, int stride, int nbLig, int nbCol);
-
+		
 		public IntPtr objetLibDataImgPtr(int nbChamps, IntPtr data, int stride, int nbLig, int nbCol)
 		{
 			ClPtr = objetLibDataImg(nbChamps, data, stride, nbLig, nbCol);
 			return ClPtr;
 		}
 
-		[DllImport("libImage.dll", CallingConvention = CallingConvention.Cdecl)]
+		[DllImport("Traitement.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern double valeurChamp(IntPtr pImg, int i);
 
 		public double objetLibValeurChamp(int i)
