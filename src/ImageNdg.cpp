@@ -701,7 +701,7 @@ CImageNdg CImageNdg::filtrage(const std::string& methode, int Ni, int Nj) {
 }
 
 
-float CImageNdg::IOU(CImageNdg Image1, CImageNdg Image2)
+double CImageNdg::IOU(CImageNdg Image1, CImageNdg Image2)
 {
 	//Lexique local
 	int inter_area = 0;

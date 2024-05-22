@@ -203,7 +203,7 @@ class CImageNdg {
 		// filtrage
 		_declspec(dllexport) CImageNdg filtrage(const std::string& methode = "moyennage", int Ni = 3, int Nj = 3); // choix "moyennage" / "median"
 
-		_declspec(dllexport) float IOU(CImageNdg Image1, CImageNdg Image2);
+		_declspec(dllexport) double IOU(CImageNdg Image1, CImageNdg Image2);
 
 		_declspec(dllexport) double hausdorffDistance(CImageNdg Image1, CImageNdg Image2);
 };

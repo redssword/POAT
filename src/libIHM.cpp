@@ -17,7 +17,10 @@ ClibIHM::ClibIHM() {
 	this->imgPt = NULL;
 }
 
-ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol){
+ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol, 
+	             int nbChamps_gt, byte* data_gt, int stride_gt, int nbLig_gt, int nbCol_gt)
+{
+	//// Image input
 	this->nbDataImg = nbChamps;
 	this->dataFromImg.resize(nbChamps);
 
@@ -25,9 +28,7 @@ ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol){
 	CImageCouleur out(nbLig, nbCol);
 
 	// on remplit les pixels 
-
 	byte* pixPtr = (byte*)data;
-
 	for (int y = 0; y < nbLig; y++)
 	{
 		for (int x = 0; x < nbCol; x++)
@@ -39,6 +40,27 @@ ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol){
 		pixPtr += stride; // largeur une seule ligne gestion multiple 32 bits
 	}
 
+	//// Image Ground truth
+	this->nbDataImg_gt = nbChamps_gt;
+	this->dataFromImg_gt.resize(nbChamps_gt);
+
+	this->imgPt_gt = new CImageCouleur(nbLig_gt, nbCol_gt);
+	CImageCouleur image_gt(nbLig_gt, nbCol_gt);
+
+	// on remplit les pixels 
+	byte* pixPtr_gt = (byte*)data_gt;
+	for (int y = 0; y < nbLig_gt; y++)
+	{
+		for (int x = 0; x < nbCol_gt; x++)
+		{
+			this->imgPt_gt->operator()(y, x)[0] = pixPtr_gt[3 * x + 2];
+			this->imgPt_gt->operator()(y, x)[1] = pixPtr_gt[3 * x + 1];
+			this->imgPt_gt->operator()(y, x)[2] = pixPtr_gt[3 * x];
+		}
+		pixPtr_gt += stride; // largeur une seule ligne gestion multiple 32 bits
+	}
+
+	//// SEUILLAGE
 	CImageNdg seuil;
 
 	int seuilBas = 128;
@@ -46,7 +68,7 @@ ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol){
 
 	seuil = this->imgPt->plan().seuillage("automatique",seuilBas,seuilHaut);
 
-	this->dataFromImg.at(0) = seuilBas;
+	//this->dataFromImg.at(0) = seuilBas;
 
 	for (int i = 0; i < seuil.lireNbPixels(); i++)
 	{
@@ -67,6 +89,8 @@ ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol){
 		}
 		pixPtr += stride; // largeur une seule ligne gestion multiple 32 bits
 	}
+
+	this->dataFromImg.at(0) = this->imgPt->plan().IOU(this->imgPt->plan(), this->imgPt_gt->plan());
 }
 
 
