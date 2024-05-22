@@ -48,4 +48,7 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ihm\program.cs" />
+  </ItemGroup>
 </Project>
