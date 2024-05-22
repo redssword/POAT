@@ -21,18 +21,25 @@ namespace IHM
 		{
 			InitializeComponent();
 		}
+		double score;
 
 		private void btnTraitement_Click(object sender, EventArgs e)
 		{
 			CImageNdgCS Img = new CImageNdgCS();
 			var bmp = new Bitmap(pBImgRef.Image);
-			unsafe
+            var bmp_gt = new Bitmap(pBVerite.Image);
+            unsafe
 			{
 				BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-				Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width);
+                BitmapData bmpData_gt = bmp_gt.LockBits(new Rectangle(0, 0, bmp_gt.Width, bmp_gt.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+                Img.objetLibDataImgPtr(false, 1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width, 
+					                   1, bmpData_gt.Scan0, bmpData_gt.Stride, bmp_gt.Height, bmp_gt.Width);
 				// 1 champ texte retour C++, le seuil auto
 				bmp.UnlockBits(bmpData);
-				pbRes.Image = bmp;
+                bmp_gt.UnlockBits(bmpData_gt);
+				score = Img.objetLibValeurChamp(0);
+				lbResIOU.Text = score.ToString();
+                pbRes.Image = bmp;
 			}
 		}
 
