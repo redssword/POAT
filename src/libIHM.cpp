@@ -51,8 +51,8 @@ ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol){
 	for (int i = 0; i < seuil.lireNbPixels(); i++)
 	{
 		out(i)[0] = (unsigned char)(255*(int)seuil(i));
-		out(i)[1] = 0;
-		out(i)[2] = 0;
+		out(i)[1] = (unsigned char)(255 * (int)seuil(i));
+		out(i)[2] = (unsigned char)(255 * (int)seuil(i));
 	}
 		
 

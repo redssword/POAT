@@ -32,6 +32,9 @@
     <ClCompile Include="..\src\ImageNdg.cpp" />
     <ClCompile Include="..\src\libIHM.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ihm\program.cs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
