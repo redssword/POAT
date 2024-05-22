@@ -32,7 +32,7 @@ namespace IHM
 			{
 				BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
                 BitmapData bmpData_gt = bmp_gt.LockBits(new Rectangle(0, 0, bmp_gt.Width, bmp_gt.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-                Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width, 
+                Img.objetLibDataImgPtr(false, 1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width, 
 					                   1, bmpData_gt.Scan0, bmpData_gt.Stride, bmp_gt.Height, bmp_gt.Width);
 				// 1 champ texte retour C++, le seuil auto
 				bmp.UnlockBits(bmpData);

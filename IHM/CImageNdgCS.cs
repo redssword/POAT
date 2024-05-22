@@ -93,13 +93,13 @@ namespace Traitement
 		}
 
 		[DllImport("Traitement.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr objetLibDataImg(int nbChamps, IntPtr data, int stride, int nbLig, int nbCol, 
+		public static extern IntPtr objetLibDataImg(bool sc, int nbChamps, IntPtr data, int stride, int nbLig, int nbCol, 
 			                                        int nbChamps_gt, IntPtr data_gt, int stride_gt, int nbLig_gt, int nbCol_gt);
 		
-		public IntPtr objetLibDataImgPtr(int nbChamps, IntPtr data, int stride, int nbLig, int nbCol,
+		public IntPtr objetLibDataImgPtr(bool sc, int nbChamps, IntPtr data, int stride, int nbLig, int nbCol,
                                          int nbChamps_gt, IntPtr data_gt, int stride_gt, int nbLig_gt, int nbCol_gt)
         {
-			ClPtr = objetLibDataImg(nbChamps, data, stride, nbLig, nbCol, 
+			ClPtr = objetLibDataImg(sc, nbChamps, data, stride, nbLig, nbCol, 
 				                    nbChamps_gt, data_gt, stride_gt, nbLig_gt, nbCol_gt);
 			return ClPtr;
 		}

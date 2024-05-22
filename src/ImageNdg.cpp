@@ -667,7 +667,11 @@ CImageNdg CImageNdg::tophat(const std::string& methode, const std::string& eltSt
 	}
 	else
 	{
-		
+		if (methode.compare("black") == 0)
+		{
+			out = this->morphologie("dilatation", eltStructurant).morphologie("erosion", eltStructurant);
+			out = out.operation(*this, "-");
+		}
 	}
 	return out;
 }

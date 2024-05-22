@@ -17,7 +17,7 @@ ClibIHM::ClibIHM() {
 	this->imgPt = NULL;
 }
 
-ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol, 
+ClibIHM::ClibIHM(bool sc, int nbChamps, byte* data, int stride, int nbLig, int nbCol, 
 	             int nbChamps_gt, byte* data_gt, int stride_gt, int nbLig_gt, int nbCol_gt)
 {
 	//// Image input
@@ -65,8 +65,15 @@ ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol,
 
 	int seuilBas = 128;
 	int seuilHaut = 255;
-
-	seuil = this->imgPt->plan().tophat("white", "V8").seuillage("manuel",seuilBas,seuilHaut);
+	if (sc)
+	{
+		seuil = this->imgPt->plan().transformation("complement").tophat("white", "V8").seuillage("automatique", seuilBas, seuilHaut);
+	}
+	else
+	{
+		seuil = this->imgPt->plan().tophat("white", "V8").seuillage("automatique", seuilBas, seuilHaut);
+	}
+	
 	
 	//this->dataFromImg.at(0) = seuilBas;
 
