@@ -323,10 +323,33 @@ CImageNdg CImageNdg::operation(const CImageNdg& im, const std::string& methode) 
 			out(i) = this->operator()(i) && im(i);
 	}
 	else
-		if (methode.compare("ou") == 0) {
-			for (int i=0;i<this->lireNbPixels();i++)
+	{
+		if (methode.compare("ou") == 0) 
+		{
+			for (int i = 0; i < this->lireNbPixels(); i++)
 				out(i) = this->operator()(i) || im(i);
 		}
+		else
+		{
+			if (methode.compare("-") == 0)
+			{
+				for (int i = 0; i < this->lireNbPixels(); i++)
+				{
+					if (this->operator()(i) - im(i) >= 0)
+					{
+						out(i) = this->operator()(i) - im(i);
+					}
+					else
+					{
+						out(i) = 0;
+					}
+					
+				}
+					
+			}
+		}
+	}
+		
 
 return out;
 }
@@ -631,6 +654,24 @@ CImageNdg CImageNdg::morphologie(const std::string& methode, const std::string& 
 	return out;
 }
 
+CImageNdg CImageNdg::tophat(const std::string& methode, const std::string& eltStructurant)
+{
+	CImageNdg out(this->lireHauteur(), this->lireLargeur());
+	out.m_sNom = this->lireNom() + "M";
+	out.choixPalette(this->lirePalette()); // conservation de la palette
+	out.m_bBinaire = this->m_bBinaire; // conservation du type
+	if (methode.compare("white") == 0)
+	{
+		out = this->morphologie("erosion", eltStructurant).morphologie("dilatation", eltStructurant);
+		out = this->operation(out, "-");
+	}
+	else
+	{
+		
+	}
+	return out;
+}
+
 // filtrage
 
 CImageNdg CImageNdg::filtrage(const std::string& methode, int Ni, int Nj) {
@@ -721,7 +762,7 @@ double CImageNdg::IOU(CImageNdg Image1, CImageNdg Image2)
 		}
 	}
 
-	iou = (float)(inter_area) / union_area;
+	iou = round(1000*(float)(inter_area) / union_area);
 	return iou;
 }
 

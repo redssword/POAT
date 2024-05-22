@@ -66,8 +66,8 @@ ClibIHM::ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol,
 	int seuilBas = 128;
 	int seuilHaut = 255;
 
-	seuil = this->imgPt->plan().seuillage("automatique",seuilBas,seuilHaut);
-
+	seuil = this->imgPt->plan().tophat("white", "V8").seuillage("manuel",seuilBas,seuilHaut);
+	
 	//this->dataFromImg.at(0) = seuilBas;
 
 	for (int i = 0; i < seuil.lireNbPixels(); i++)
