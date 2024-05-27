@@ -221,14 +221,14 @@
 			// imageUniqueToolStripMenuItem
 			// 
 			this.imageUniqueToolStripMenuItem.Name = "imageUniqueToolStripMenuItem";
-			this.imageUniqueToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+			this.imageUniqueToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.imageUniqueToolStripMenuItem.Text = "Image Unique";
 			this.imageUniqueToolStripMenuItem.Click += new System.EventHandler(this.imageUniqueToolStripMenuItem_Click);
 			// 
 			// dossierDimageToolStripMenuItem
 			// 
 			this.dossierDimageToolStripMenuItem.Name = "dossierDimageToolStripMenuItem";
-			this.dossierDimageToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+			this.dossierDimageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.dossierDimageToolStripMenuItem.Text = "Dossier d\'image";
 			this.dossierDimageToolStripMenuItem.Click += new System.EventHandler(this.dossierDimageToolStripMenuItem_Click);
 			// 
@@ -369,9 +369,11 @@
 			// 
 			this.TbAff.Location = new System.Drawing.Point(74, 356);
 			this.TbAff.Maximum = 1000;
+			this.TbAff.Minimum = 10;
 			this.TbAff.Name = "TbAff";
 			this.TbAff.Size = new System.Drawing.Size(370, 45);
 			this.TbAff.TabIndex = 28;
+			this.TbAff.Value = 10;
 			this.TbAff.ValueChanged += new System.EventHandler(this.TbAff_ValueChanged);
 			// 
 			// Form1
