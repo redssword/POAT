@@ -47,9 +47,6 @@
 			this.fichierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.imageUniqueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.dossierDimageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.tratementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.méthodToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.distanceDeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.FBDDir = new System.Windows.Forms.FolderBrowserDialog();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
 			this.lbMoyenneIn = new System.Windows.Forms.Label();
@@ -201,8 +198,7 @@
 			// menuStrip1
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fichierToolStripMenuItem,
-            this.tratementToolStripMenuItem});
+            this.fichierToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(1429, 24);
@@ -231,27 +227,6 @@
 			this.dossierDimageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.dossierDimageToolStripMenuItem.Text = "Dossier d\'image";
 			this.dossierDimageToolStripMenuItem.Click += new System.EventHandler(this.dossierDimageToolStripMenuItem_Click);
-			// 
-			// tratementToolStripMenuItem
-			// 
-			this.tratementToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.méthodToolStripMenuItem,
-            this.distanceDeToolStripMenuItem});
-			this.tratementToolStripMenuItem.Name = "tratementToolStripMenuItem";
-			this.tratementToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
-			this.tratementToolStripMenuItem.Text = "Calcul score";
-			// 
-			// méthodToolStripMenuItem
-			// 
-			this.méthodToolStripMenuItem.Name = "méthodToolStripMenuItem";
-			this.méthodToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-			this.méthodToolStripMenuItem.Text = "Méthode IOU";
-			// 
-			// distanceDeToolStripMenuItem
-			// 
-			this.distanceDeToolStripMenuItem.Name = "distanceDeToolStripMenuItem";
-			this.distanceDeToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-			this.distanceDeToolStripMenuItem.Text = "Distance de Hausdorff";
 			// 
 			// lbMoyenneIn
 			// 
@@ -373,7 +348,7 @@
 			this.TbAff.Name = "TbAff";
 			this.TbAff.Size = new System.Drawing.Size(370, 45);
 			this.TbAff.TabIndex = 28;
-			this.TbAff.Value = 10;
+			this.TbAff.Value = 50;
 			this.TbAff.ValueChanged += new System.EventHandler(this.TbAff_ValueChanged);
 			// 
 			// Form1
@@ -443,9 +418,6 @@
         private System.Windows.Forms.OpenFileDialog ofdImg;
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ToolStripMenuItem fichierToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem tratementToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem méthodToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem distanceDeToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem imageUniqueToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem dossierDimageToolStripMenuItem;
 		private System.Windows.Forms.FolderBrowserDialog FBDDir;

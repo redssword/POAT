@@ -89,7 +89,6 @@ namespace IHM
 			resIn = new List<string>();
 
 			ImAff = 0;
-			TimerAff.Start();
 
 		}
 		double score;
@@ -135,6 +134,7 @@ namespace IHM
 						FilesImgIn.Add(ofdImg.FileName);
 						FilesGTIn.Add(GroungTruthPath);
 					}
+					TimerAff.Start();
 				}
 			}
 		}
@@ -180,6 +180,7 @@ namespace IHM
 						}
 
 					}
+					TimerAff.Start();
 				}
 			}
 		}
@@ -254,7 +255,7 @@ namespace IHM
 			if (ImAff == 300)
 				ImAff = 0;
 
-			if (FilesImgIn.Count > 0)
+			if (FilesImgSc.Count > 1)
 			{
 				var ImgOrigine = new Bitmap(FilesImgSc[ImAff]);
 				var bmpIm = new Bitmap(FilesImgSc[ImAff]);
@@ -277,8 +278,32 @@ namespace IHM
 				AfficherResultat(pbResSc, bmpIm);
 				AfficherScore(lbResIOUSc, score.ToString());
 			}
+			
+			else if (FilesImgSc.Count == 1)
+			{
+				var ImgOrigine = new Bitmap(FilesImgSc[0]);
+				var bmpIm = new Bitmap(FilesImgSc[0]);
+				var bmpGt = new Bitmap(FilesGTSc[0]);
 
-			if (FilesImgIn.Count >0)
+				AfficherResultat(pBImgRefSc, ImgOrigine);
+				AfficherResultat(pBVeriteSc, bmpGt);
+				CImageNdgCS Img = new CImageNdgCS();
+				unsafe
+				{
+					BitmapData bmpData = bmpIm.LockBits(new Rectangle(0, 0, bmpIm.Width, bmpIm.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					BitmapData bmpdataGt = bmpGt.LockBits(new Rectangle(0, 0, bmpGt.Width, bmpGt.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+					Img.objetLibDataImgPtr(true, 1, bmpData.Scan0, bmpData.Stride, bmpIm.Height, bmpIm.Width,
+												 1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
+					bmpIm.UnlockBits(bmpData);
+					bmpGt.UnlockBits(bmpdataGt);
+					score = Img.objetLibValeurChamp(0);
+				}
+				AfficherResultat(pbResSc, bmpIm);
+				AfficherScore(lbResIOUSc, score.ToString());
+			}
+
+			if (FilesImgIn.Count > 1)
 			{
 				var bmgOrigine = new Bitmap(FilesImgIn[ImAff]);
 				var bmpImIn = new Bitmap(FilesImgIn[ImAff]);
@@ -303,6 +328,32 @@ namespace IHM
 				AfficherScore(lbResIOUIn, score.ToString());
 
 			}
+
+			else if (FilesImgIn.Count == 1)
+			{
+				var bmgOrigine = new Bitmap(FilesImgIn[0]);
+				var bmpImIn = new Bitmap(FilesImgIn[0]);
+				var bmpGtIn = new Bitmap(FilesGTIn[0]);
+
+				AfficherResultat(pBImgRefIn, bmgOrigine);
+				AfficherResultat(pBVeriteIn, bmpGtIn);
+
+				CImageNdgCS Img = new CImageNdgCS();
+				unsafe
+				{
+					BitmapData bmpData = bmpImIn.LockBits(new Rectangle(0, 0, bmpImIn.Width, bmpImIn.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					BitmapData bmpdataGt = bmpGtIn.LockBits(new Rectangle(0, 0, bmpGtIn.Width, bmpGtIn.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+					Img.objetLibDataImgPtr(false, 1, bmpData.Scan0, bmpData.Stride, bmpImIn.Height, bmpImIn.Width,
+												 1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
+					bmpImIn.UnlockBits(bmpData);
+					bmpGtIn.UnlockBits(bmpdataGt);
+					score = Img.objetLibValeurChamp(0);
+				}
+				AfficherResultat(pbResIN, bmpImIn);
+				AfficherScore(lbResIOUIn, score.ToString());
+			}
+
 			ImAff++;
 
 			TimerAff.Start();

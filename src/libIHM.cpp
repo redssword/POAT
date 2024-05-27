@@ -65,7 +65,7 @@ ClibIHM::ClibIHM(bool sc, int nbChamps, byte* data, int stride, int nbLig, int n
 
 	int seuilBas = 128;
 	int seuilHaut = 255;
-	if (sc)
+	if (!sc)
 	{
 		seuil = this->imgPt->plan().transformation("complement").tophat("white", "V8").seuillage("automatique", seuilBas, seuilHaut);
 	}
