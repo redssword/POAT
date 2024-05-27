@@ -14,17 +14,17 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Traitement;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.LinkLabel;
 
 namespace IHM
 {
 	public partial class Form1 : Form
 	{
-		private Thread threadaff;
+		private int ImAff;
 		private Thread threadIn;
 		private Thread threadSc;
 		private Thread threadRes;
-		private object objtolock;
 
 		private List<string> FilesImg;
 		private List<string> FilesGT;
@@ -37,7 +37,6 @@ namespace IHM
 		private List<string> resIn;
 
 
-		private AutoResetEvent EV_Aff;
 		private AutoResetEvent EV_In;
 		private AutoResetEvent EV_Sc;
 
@@ -60,15 +59,12 @@ namespace IHM
 			EV_Sc = new AutoResetEvent(false);
 			EV_In = new AutoResetEvent(false);
 
-			threadaff = new Thread(new ThreadStart(Affichage));
 			threadIn = new Thread(new ThreadStart(TraitmentImgIn));
 			threadSc = new Thread(new ThreadStart(TraitmentImgSc));
 			threadRes = new Thread(new ThreadStart(ResCsv));
 
 			threadRes.Start();
-			threadaff.Start();
 
-			objtolock = new object();
 			FilesImg = new List<string>();
 			FilesGT = new List<string>();
 			FilesImgSc = new List<string>();
@@ -78,38 +74,15 @@ namespace IHM
 			resSc = new List<string>();
 			resIn = new List<string>();
 
-			EV_Aff = new AutoResetEvent(true);
+			ImAff = 0;
+			TimerAff.Start();
+
 		}
 
 		private void btnTraitement_Click(object sender, EventArgs e)
 		{
-
-			int max = FilesImg.Count();
-			if (max == 1)
-			{
-				CImageNdgCS Img = new CImageNdgCS();
-				var bmp = new Bitmap(FilesImg[0]);
-				unsafe
-				{
-					BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-					Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width);
-					// 1 champ texte retour C++, le seuil auto
-					bmp.UnlockBits(bmpData);
-					pbRes.Image = bmp;
-				}
-
-				FilesImg.Clear();
-				FilesImgIn.Clear();
-				FilesImgSc.Clear();
-				FilesGT.Clear();
-				FilesGTIn.Clear();
-				FilesGTSc.Clear();
-			}
-			else if (max > 1)
-			{
-				threadIn.Start();
-				threadSc.Start();
-			}
+			threadIn.Start();
+			threadSc.Start();
 		}
 
 		private void imageUniqueToolStripMenuItem_Click(object sender, EventArgs e)
@@ -118,6 +91,12 @@ namespace IHM
 			{
 				if (ofdImg.FileName.EndsWith(".bmp"))
 				{
+					FilesImg.Clear();
+					FilesImgSc.Clear();
+					FilesGTSc.Clear();
+					FilesImgIn.Clear();
+					FilesGTIn.Clear();
+
 					var strings = ofdImg.FileName.Split('\\');
 					var GroungTruthPath = strings[0] + "\\";
 					for (int i = 1; i < strings.Length - 2; i++)
@@ -141,8 +120,6 @@ namespace IHM
 						FilesImgIn.Add(ofdImg.FileName);
 						FilesGTIn.Add(GroungTruthPath);
 					}
-
-					EV_Aff.Set();
 				}
 			}
 		}
@@ -153,6 +130,12 @@ namespace IHM
 			{
 				if (FBDDir.SelectedPath.EndsWith(" - bmp"))
 				{
+					FilesImg.Clear();
+					FilesImgSc.Clear();
+					FilesGTSc.Clear();
+					FilesImgIn.Clear();
+					FilesGTIn.Clear();
+
 					var infoDirImg = new DirectoryInfo(FBDDir.SelectedPath);
 					foreach (var fileimg in infoDirImg.GetFiles())
 					{
@@ -182,28 +165,7 @@ namespace IHM
 						}
 
 					}
-
-					EV_Aff.Set();
 				}
-			}
-		}
-
-		private void Affichage()
-		{
-			while (true)
-			{
-				while (!EV_Aff.WaitOne()) ;
-
-				for (int i = 0; i < FilesImg.Count(); i++)
-				{
-					Bitmap bmpIm = new Bitmap(FilesImg[i]);
-					Bitmap bmpGt = new Bitmap(FilesGT[i]);
-
-					AfficherResultat(pBImgRef, bmpIm);
-					AfficherResultat(pBVerite, bmpGt);
-					Thread.Sleep(50);
-				}
-
 			}
 		}
 
@@ -219,13 +181,11 @@ namespace IHM
 					BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
 					Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width);
 					bmp.UnlockBits(bmpData);
-					AfficherResultat(pbRes, bmp);
 				}
 				resSc.Add(res);
+				Thread.Sleep(10);
 			}
 			EV_Sc.Set();
-			FilesImgSc.Clear();
-			FilesGTSc.Clear();
 		}
 
 		private void TraitmentImgIn()
@@ -240,13 +200,11 @@ namespace IHM
 					BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
 					Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width);
 					bmp.UnlockBits(bmpData);
-					AfficherResultat(pbRes, bmp);
 				}
 				resIn.Add(res);
+				Thread.Sleep(10);
 			}
 			EV_In.Set();
-			FilesImgIn.Clear();
-			FilesGTIn.Clear();
 		}
 
 		private void ResCsv()
@@ -259,6 +217,55 @@ namespace IHM
 			File.WriteAllLines(csvIn, resIn);
 			resIn.Clear();
 			resSc.Clear();
+		}
+
+		private void TimerAff_Tick(object sender, EventArgs e)
+		{
+			TimerAff.Stop();
+			if (ImAff == 300)
+				ImAff = 0;
+
+			if (FilesImgIn.Count > 0)
+			{
+				var bmpIm = new Bitmap(FilesImgSc[ImAff]);
+				var bmpGt = new Bitmap(FilesGTSc[ImAff]);
+
+				CImageNdgCS Img = new CImageNdgCS();
+				unsafe
+				{
+					BitmapData bmpData = bmpIm.LockBits(new Rectangle(0, 0, bmpIm.Width, bmpIm.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmpIm.Height, bmpIm.Width);
+					bmpIm.UnlockBits(bmpData);
+				}
+
+				AfficherResultat(pBImgRefSc, bmpIm);
+				AfficherResultat(pBVeriteSc, bmpGt);
+			}
+
+			if (FilesImgIn.Count >0)
+			{
+				var bmpImIn = new Bitmap(FilesImgIn[ImAff]);
+				var bmpGtIn = new Bitmap(FilesGTIn[ImAff]);
+
+				CImageNdgCS Img = new CImageNdgCS();
+				unsafe
+				{
+					BitmapData bmpData = bmpImIn.LockBits(new Rectangle(0, 0, bmpImIn.Width, bmpImIn.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmpImIn.Height, bmpImIn.Width);
+					bmpImIn.UnlockBits(bmpData);
+				}
+
+				AfficherResultat(pBImgRefIn, bmpImIn);
+				AfficherResultat(pBVeriteIn, bmpGtIn);
+			}
+			ImAff++;
+
+			TimerAff.Start();
+		}
+
+		private void TbAff_ValueChanged(object sender, EventArgs e)
+		{
+			TimerAff.Interval = TbAff.Value;
 		}
 	}
 }
