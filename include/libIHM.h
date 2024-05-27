@@ -18,6 +18,11 @@ private:
 	std::vector<double>		dataFromImg; // champs Texte de l'IHM
 	CImageCouleur*          imgPt;       // 
 
+	//GT
+	int						nbDataImg_gt; // nb champs Texte de l'IHM
+	std::vector<double>		dataFromImg_gt; // champs Texte de l'IHM
+	CImageCouleur*          imgPt_gt;       // 
+
 	///////////////////////////////////////
 public:
 	///////////////////////////////////////
@@ -25,7 +30,8 @@ public:
 	// constructeurs
 	_declspec(dllexport) ClibIHM(); // par défaut
 
-	_declspec(dllexport) ClibIHM(int nbChamps, byte* data, int stride, int nbLig, int nbCol); // par image format bmp C#
+	_declspec(dllexport) ClibIHM(bool sc, int nbChamps, byte* data, int stride, int nbLig, int nbCol,
+		                         int nbChamps_gt, byte* data_gt, int stride_gt, int nbLig_gt, int nbCol_gt); // par image format bmp C#
 
 	_declspec(dllexport) ~ClibIHM();
 
@@ -51,9 +57,11 @@ extern "C" _declspec(dllexport) ClibIHM* objetLib()
 	return pImg;
 }
 
-extern "C" _declspec(dllexport) ClibIHM* objetLibDataImg(int nbChamps, byte* data, int stride, int nbLig, int nbCol)
+extern "C" _declspec(dllexport) ClibIHM* objetLibDataImg(bool sc, int nbChamps, byte * data, int stride, int nbLig, int nbCol,
+	                                                     int nbChamps_gt, byte * data_gt, int stride_gt, int nbLig_gt, int nbCol_gt)
 {
-	ClibIHM* pImg = new ClibIHM(nbChamps,data,stride,nbLig,nbCol);
+	ClibIHM* pImg = new ClibIHM(sc, nbChamps,data,stride,nbLig,nbCol,
+		                        nbChamps_gt,data_gt,stride_gt,nbLig_gt,nbCol_gt);
 	return pImg;
 }
 

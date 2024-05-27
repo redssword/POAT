@@ -200,10 +200,12 @@ class CImageNdg {
 		// morphologie
 		_declspec(dllexport) CImageNdg morphologie(const std::string& methode = "erosion", const std::string& eltStructurant = "V8"); // choix "erosion" / "dilatation", "V8"/"V4"
 
+		_declspec(dllexport) CImageNdg tophat(const std::string& methode = "white", const std::string& eltStructurant = "V8"); // Choix "white" / "black" , "V8" / "V4"
+
 		// filtrage
 		_declspec(dllexport) CImageNdg filtrage(const std::string& methode = "moyennage", int Ni = 3, int Nj = 3); // choix "moyennage" / "median"
 
-		_declspec(dllexport) float IOU(CImageNdg Image1, CImageNdg Image2);
+		_declspec(dllexport) double IOU(CImageNdg Image1, CImageNdg Image2);
 
 		_declspec(dllexport) double hausdorffDistance(CImageNdg Image1, CImageNdg Image2);
 };

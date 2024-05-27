@@ -66,6 +66,7 @@ namespace Traitement
 		// on crée une classe C# avec pointeur sur l'objet C++
 		// puis des static extern exportées de chaque méthode utile de la classe C++
 		public IntPtr ClPtr;
+		public int score;
 
 		public CImageNdgCS()
 		{
@@ -92,11 +93,14 @@ namespace Traitement
 		}
 
 		[DllImport("Traitement.dll", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr objetLibDataImg(int nbChamps, IntPtr data, int stride, int nbLig, int nbCol);
+		public static extern IntPtr objetLibDataImg(bool sc, int nbChamps, IntPtr data, int stride, int nbLig, int nbCol, 
+			                                        int nbChamps_gt, IntPtr data_gt, int stride_gt, int nbLig_gt, int nbCol_gt);
 		
-		public IntPtr objetLibDataImgPtr(int nbChamps, IntPtr data, int stride, int nbLig, int nbCol)
-		{
-			ClPtr = objetLibDataImg(nbChamps, data, stride, nbLig, nbCol);
+		public IntPtr objetLibDataImgPtr(bool sc, int nbChamps, IntPtr data, int stride, int nbLig, int nbCol,
+                                         int nbChamps_gt, IntPtr data_gt, int stride_gt, int nbLig_gt, int nbCol_gt)
+        {
+			ClPtr = objetLibDataImg(sc, nbChamps, data, stride, nbLig, nbCol, 
+				                    nbChamps_gt, data_gt, stride_gt, nbLig_gt, nbCol_gt);
 			return ClPtr;
 		}
 

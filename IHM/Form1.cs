@@ -80,10 +80,10 @@ namespace IHM
 
 			EV_Aff = new AutoResetEvent(true);
 		}
+		double score;
 
 		private void btnTraitement_Click(object sender, EventArgs e)
 		{
-
 			int max = FilesImg.Count();
 			if (max == 1)
 			{
