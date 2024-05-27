@@ -62,15 +62,17 @@ ClibIHM::ClibIHM(bool sc, int nbChamps, byte* data, int stride, int nbLig, int n
 
 	//// SEUILLAGE
 	CImageNdg seuil;
-
-	int seuilBas = 128;
-	int seuilHaut = 255;
-	if (sc)
+	if (!sc)
 	{
-		seuil = this->imgPt->plan().transformation("complement").tophat("white", "V8").seuillage("automatique", seuilBas, seuilHaut);
+		int seuilBas = 170;
+		int seuilHaut = 255;
+		seuil = this->imgPt->plan().transformation("complement").tophat("white", "V8").seuillage("", seuilBas, seuilHaut);// .seuillage("automatique", seuilBas, seuilHaut);
+		// .tophat("white", "V8");
 	}
 	else
 	{
+		int seuilBas = 127;
+		int seuilHaut = 255;
 		seuil = this->imgPt->plan().tophat("white", "V8").seuillage("automatique", seuilBas, seuilHaut);
 	}
 	
@@ -79,7 +81,7 @@ ClibIHM::ClibIHM(bool sc, int nbChamps, byte* data, int stride, int nbLig, int n
 
 	for (int i = 0; i < seuil.lireNbPixels(); i++)
 	{
-		out(i)[0] = (unsigned char)(255*(int)seuil(i));
+		out(i)[0] = (unsigned char)(255 * (int)seuil(i));
 		out(i)[1] = (unsigned char)(255 * (int)seuil(i));
 		out(i)[2] = (unsigned char)(255 * (int)seuil(i));
 	}
