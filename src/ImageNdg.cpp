@@ -363,8 +363,8 @@ CImageNdg CImageNdg::seuillage(const std::string& methode, int& seuilBas, int& s
 		out.m_sNom     = this->lireNom()+"S";
 		out.choixPalette("binaire"); // palette binaire par défaut
 		out.m_bBinaire = true;
-		seuilBas = 128;
-		seuilHaut = 255;
+		//seuilBas = 128;
+		//seuilHaut = 255;
 
 		// création lut pour optimisation calcul
 		std::vector<int> lut;
