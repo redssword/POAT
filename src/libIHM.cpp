@@ -62,6 +62,7 @@ ClibIHM::ClibIHM(bool sc, int nbChamps, byte* data, int stride, int nbLig, int n
 
 	//// SEUILLAGE
 	CImageNdg seuil;
+
 	if (!sc)
 	{
 		int seuilBas = 170;

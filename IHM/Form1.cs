@@ -14,17 +14,18 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Traitement;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.LinkLabel;
+using Label = System.Windows.Forms.Label;
 
 namespace IHM
 {
 	public partial class Form1 : Form
 	{
-		private Thread threadaff;
+		private int ImAff;
 		private Thread threadIn;
 		private Thread threadSc;
 		private Thread threadRes;
-		private object objtolock;
 
 		private List<string> FilesImg;
 		private List<string> FilesGT;
@@ -37,21 +38,33 @@ namespace IHM
 		private List<string> resIn;
 
 
-		private AutoResetEvent EV_Aff;
 		private AutoResetEvent EV_In;
 		private AutoResetEvent EV_Sc;
 
-		private delegate void affResultat(PictureBox Pbx, Bitmap bmp);
+		private delegate void affImage(PictureBox Pbx, Bitmap bmp);
 		private void AfficherResultat(PictureBox Pb, Bitmap btmp)
 		{
 			if (Pb.InvokeRequired)
 			{
-				affResultat d;
-				d = new affResultat(AfficherResultat);
+				affImage d;
+				d = new affImage(AfficherResultat);
 				this.Invoke(d, new object[] { Pb, btmp });
 			}
 			else Pb.Image = btmp;
 		}
+
+		private delegate void affScore(Label lbl, string res);
+		private void AfficherScore(Label lbl, string res)
+		{
+			if (lbl.InvokeRequired)
+			{
+				affScore d;
+				d = new affScore(AfficherScore);
+				this.Invoke(d, new object[] { lbl, res });
+			}
+			else lbl.Text = res;
+		}
+
 
 
 		public Form1()
@@ -60,15 +73,12 @@ namespace IHM
 			EV_Sc = new AutoResetEvent(false);
 			EV_In = new AutoResetEvent(false);
 
-			threadaff = new Thread(new ThreadStart(Affichage));
 			threadIn = new Thread(new ThreadStart(TraitmentImgIn));
 			threadSc = new Thread(new ThreadStart(TraitmentImgSc));
 			threadRes = new Thread(new ThreadStart(ResCsv));
 
 			threadRes.Start();
-			threadaff.Start();
 
-			objtolock = new object();
 			FilesImg = new List<string>();
 			FilesGT = new List<string>();
 			FilesImgSc = new List<string>();
@@ -78,38 +88,15 @@ namespace IHM
 			resSc = new List<string>();
 			resIn = new List<string>();
 
-			EV_Aff = new AutoResetEvent(true);
+			ImAff = 0;
+
 		}
 		double score;
 
 		private void btnTraitement_Click(object sender, EventArgs e)
 		{
-			int max = FilesImg.Count();
-			if (max == 1)
-			{
-				CImageNdgCS Img = new CImageNdgCS();
-				var bmp = new Bitmap(FilesImg[0]);
-				unsafe
-				{
-					BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-					Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width);
-					// 1 champ texte retour C++, le seuil auto
-					bmp.UnlockBits(bmpData);
-					pbRes.Image = bmp;
-				}
-
-				FilesImg.Clear();
-				FilesImgIn.Clear();
-				FilesImgSc.Clear();
-				FilesGT.Clear();
-				FilesGTIn.Clear();
-				FilesGTSc.Clear();
-			}
-			else if (max > 1)
-			{
-				threadIn.Start();
-				threadSc.Start();
-			}
+			threadIn.Start();
+			threadSc.Start();
 		}
 
 		private void imageUniqueToolStripMenuItem_Click(object sender, EventArgs e)
@@ -118,6 +105,12 @@ namespace IHM
 			{
 				if (ofdImg.FileName.EndsWith(".bmp"))
 				{
+					FilesImg.Clear();
+					FilesImgSc.Clear();
+					FilesGTSc.Clear();
+					FilesImgIn.Clear();
+					FilesGTIn.Clear();
+
 					var strings = ofdImg.FileName.Split('\\');
 					var GroungTruthPath = strings[0] + "\\";
 					for (int i = 1; i < strings.Length - 2; i++)
@@ -141,8 +134,7 @@ namespace IHM
 						FilesImgIn.Add(ofdImg.FileName);
 						FilesGTIn.Add(GroungTruthPath);
 					}
-
-					EV_Aff.Set();
+					TimerAff.Start();
 				}
 			}
 		}
@@ -153,6 +145,12 @@ namespace IHM
 			{
 				if (FBDDir.SelectedPath.EndsWith(" - bmp"))
 				{
+					FilesImg.Clear();
+					FilesImgSc.Clear();
+					FilesGTSc.Clear();
+					FilesImgIn.Clear();
+					FilesGTIn.Clear();
+
 					var infoDirImg = new DirectoryInfo(FBDDir.SelectedPath);
 					foreach (var fileimg in infoDirImg.GetFiles())
 					{
@@ -182,28 +180,8 @@ namespace IHM
 						}
 
 					}
-
-					EV_Aff.Set();
+					TimerAff.Start();
 				}
-			}
-		}
-
-		private void Affichage()
-		{
-			while (true)
-			{
-				while (!EV_Aff.WaitOne()) ;
-
-				for (int i = 0; i < FilesImg.Count(); i++)
-				{
-					Bitmap bmpIm = new Bitmap(FilesImg[i]);
-					Bitmap bmpGt = new Bitmap(FilesGT[i]);
-
-					AfficherResultat(pBImgRef, bmpIm);
-					AfficherResultat(pBVerite, bmpGt);
-					Thread.Sleep(50);
-				}
-
 			}
 		}
 
@@ -211,42 +189,52 @@ namespace IHM
 		{
 			for (int i = 0; i < FilesImgSc.Count(); i++)
 			{
-				string res = $"Sc_{i + 1}; IOU; Hausdorf; moyenne des 2";
+				string res = $"Sc_{i + 1};";
+				var bmpImSc = new Bitmap(FilesImgSc[i]);
+				var bmpGtIn = new Bitmap(FilesGTSc[i]);
+
 				CImageNdgCS Img = new CImageNdgCS();
-				var bmp = new Bitmap(FilesImgSc[i]);
 				unsafe
 				{
-					BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-					Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width);
-					bmp.UnlockBits(bmpData);
-					AfficherResultat(pbRes, bmp);
+					BitmapData bmpData = bmpImSc.LockBits(new Rectangle(0, 0, bmpImSc.Width, bmpImSc.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					BitmapData bmpdataGt = bmpGtIn.LockBits(new Rectangle(0, 0, bmpGtIn.Width, bmpGtIn.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+					Img.objetLibDataImgPtr(true, 1, bmpData.Scan0, bmpData.Stride, bmpImSc.Height, bmpImSc.Width,
+												 1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
+					bmpImSc.UnlockBits(bmpData);
+					bmpGtIn.UnlockBits(bmpdataGt);
+					score = Img.objetLibValeurChamp(0);
 				}
+				res += score + "; Hausdorf; moyenne des 2 ";
 				resSc.Add(res);
 			}
 			EV_Sc.Set();
-			FilesImgSc.Clear();
-			FilesGTSc.Clear();
 		}
 
 		private void TraitmentImgIn()
 		{
 			for (int i = 0; i < FilesImgIn.Count(); i++)
 			{
-				string res = $"In_{i + 1}; IOU; Hausdorf; moyenne des 2";
+				string res = $"In_{i + 1};";
+				var bmpImSc = new Bitmap(FilesImgIn[i]);
+				var bmpGtIn = new Bitmap(FilesGTIn[i]);
+
 				CImageNdgCS Img = new CImageNdgCS();
-				var bmp = new Bitmap(FilesImgIn[i]);
 				unsafe
 				{
-					BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-					Img.objetLibDataImgPtr(1, bmpData.Scan0, bmpData.Stride, bmp.Height, bmp.Width);
-					bmp.UnlockBits(bmpData);
-					AfficherResultat(pbRes, bmp);
+					BitmapData bmpData = bmpImSc.LockBits(new Rectangle(0, 0, bmpImSc.Width, bmpImSc.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					BitmapData bmpdataGt = bmpGtIn.LockBits(new Rectangle(0, 0, bmpGtIn.Width, bmpGtIn.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+					Img.objetLibDataImgPtr(false, 1, bmpData.Scan0, bmpData.Stride, bmpImSc.Height, bmpImSc.Width,
+												 1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
+					bmpImSc.UnlockBits(bmpData);
+					bmpGtIn.UnlockBits(bmpdataGt);
+					score = Img.objetLibValeurChamp(0);
 				}
+				res += score + "; Hausdorf; moyenne des 2 ";
 				resIn.Add(res);
 			}
 			EV_In.Set();
-			FilesImgIn.Clear();
-			FilesGTIn.Clear();
 		}
 
 		private void ResCsv()
@@ -259,6 +247,121 @@ namespace IHM
 			File.WriteAllLines(csvIn, resIn);
 			resIn.Clear();
 			resSc.Clear();
+		}
+
+		private void TimerAff_Tick(object sender, EventArgs e)
+		{
+			TimerAff.Stop();
+			if (ImAff == 300)
+				ImAff = 0;
+
+			if (FilesImgSc.Count > 1)
+			{
+				var ImgOrigine = new Bitmap(FilesImgSc[ImAff]);
+				var bmpIm = new Bitmap(FilesImgSc[ImAff]);
+				var bmpGt = new Bitmap(FilesGTSc[ImAff]);
+
+				AfficherResultat(pBImgRefSc, ImgOrigine);
+				AfficherResultat(pBVeriteSc, bmpGt);
+				CImageNdgCS Img = new CImageNdgCS();
+				unsafe
+				{
+					BitmapData bmpData = bmpIm.LockBits(new Rectangle(0, 0, bmpIm.Width, bmpIm.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					BitmapData bmpdataGt = bmpGt.LockBits(new Rectangle(0, 0, bmpGt.Width, bmpGt.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+					Img.objetLibDataImgPtr(true, 1, bmpData.Scan0, bmpData.Stride, bmpIm.Height, bmpIm.Width,
+										         1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
+					bmpIm.UnlockBits(bmpData);
+					bmpGt.UnlockBits(bmpdataGt);
+					score = Img.objetLibValeurChamp(0);
+				}
+				AfficherResultat(pbResSc, bmpIm);
+				AfficherScore(lbResIOUSc, score.ToString());
+			}
+			
+			else if (FilesImgSc.Count == 1)
+			{
+				var ImgOrigine = new Bitmap(FilesImgSc[0]);
+				var bmpIm = new Bitmap(FilesImgSc[0]);
+				var bmpGt = new Bitmap(FilesGTSc[0]);
+
+				AfficherResultat(pBImgRefSc, ImgOrigine);
+				AfficherResultat(pBVeriteSc, bmpGt);
+				CImageNdgCS Img = new CImageNdgCS();
+				unsafe
+				{
+					BitmapData bmpData = bmpIm.LockBits(new Rectangle(0, 0, bmpIm.Width, bmpIm.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					BitmapData bmpdataGt = bmpGt.LockBits(new Rectangle(0, 0, bmpGt.Width, bmpGt.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+					Img.objetLibDataImgPtr(true, 1, bmpData.Scan0, bmpData.Stride, bmpIm.Height, bmpIm.Width,
+												 1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
+					bmpIm.UnlockBits(bmpData);
+					bmpGt.UnlockBits(bmpdataGt);
+					score = Img.objetLibValeurChamp(0);
+				}
+				AfficherResultat(pbResSc, bmpIm);
+				AfficherScore(lbResIOUSc, score.ToString());
+			}
+
+			if (FilesImgIn.Count > 1)
+			{
+				var bmgOrigine = new Bitmap(FilesImgIn[ImAff]);
+				var bmpImIn = new Bitmap(FilesImgIn[ImAff]);
+				var bmpGtIn = new Bitmap(FilesGTIn[ImAff]);
+
+				AfficherResultat(pBImgRefIn, bmgOrigine);
+				AfficherResultat(pBVeriteIn, bmpGtIn);
+
+				CImageNdgCS Img = new CImageNdgCS();
+				unsafe
+				{
+					BitmapData bmpData = bmpImIn.LockBits(new Rectangle(0, 0, bmpImIn.Width, bmpImIn.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					BitmapData bmpdataGt = bmpGtIn.LockBits(new Rectangle(0, 0, bmpGtIn.Width, bmpGtIn.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+					Img.objetLibDataImgPtr(false, 1, bmpData.Scan0, bmpData.Stride, bmpImIn.Height, bmpImIn.Width,
+												 1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
+					bmpImIn.UnlockBits(bmpData);
+					bmpGtIn.UnlockBits(bmpdataGt);
+					score = Img.objetLibValeurChamp(0);
+				}
+				AfficherResultat(pbResIN, bmpImIn);
+				AfficherScore(lbResIOUIn, score.ToString());
+
+			}
+
+			else if (FilesImgIn.Count == 1)
+			{
+				var bmgOrigine = new Bitmap(FilesImgIn[0]);
+				var bmpImIn = new Bitmap(FilesImgIn[0]);
+				var bmpGtIn = new Bitmap(FilesGTIn[0]);
+
+				AfficherResultat(pBImgRefIn, bmgOrigine);
+				AfficherResultat(pBVeriteIn, bmpGtIn);
+
+				CImageNdgCS Img = new CImageNdgCS();
+				unsafe
+				{
+					BitmapData bmpData = bmpImIn.LockBits(new Rectangle(0, 0, bmpImIn.Width, bmpImIn.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+					BitmapData bmpdataGt = bmpGtIn.LockBits(new Rectangle(0, 0, bmpGtIn.Width, bmpGtIn.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+					Img.objetLibDataImgPtr(false, 1, bmpData.Scan0, bmpData.Stride, bmpImIn.Height, bmpImIn.Width,
+												 1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
+					bmpImIn.UnlockBits(bmpData);
+					bmpGtIn.UnlockBits(bmpdataGt);
+					score = Img.objetLibValeurChamp(0);
+				}
+				AfficherResultat(pbResIN, bmpImIn);
+				AfficherScore(lbResIOUIn, score.ToString());
+			}
+
+			ImAff++;
+
+			TimerAff.Start();
+		}
+
+		private void TbAff_ValueChanged(object sender, EventArgs e)
+		{
+			TimerAff.Interval = TbAff.Value;
 		}
 	}
 }

@@ -26,12 +26,12 @@ CImageNdg::CImageNdg(int hauteur, int largeur, int valeur) {
 
 	this->m_iHauteur = hauteur;
 	this->m_iLargeur = largeur;
-	this->m_bBinaire	= false; // Image Ndg par dÈfaut, binaire aprËs seuillage
+	this->m_bBinaire	= false; // Image Ndg par d√©faut, binaire apr√®s seuillage
 	this->m_sNom      = "inconnu";
 
 	this->m_pucPixel = new unsigned char[hauteur*largeur];
 	this->m_pucPalette = new unsigned char[256*4];	
-	choixPalette("grise"); // palette grise par dÈfaut, choix utilisateur 
+	choixPalette("grise"); // palette grise par d√©faut, choix utilisateur 
 	if (valeur != -1) 
 		for (int i=0;i<this->lireNbPixels();i++)
 			this->m_pucPixel[i] = valeur;
@@ -60,7 +60,7 @@ CImageNdg::CImageNdg(const std::string& name) {
 						this->m_pucPalette = new unsigned char[256*4];	
 						this->m_pucPixel = new unsigned char[infoHeader.biHeight * infoHeader.biWidth];
 
-						// gÈrer multiple de 32 bits via zÈros Èventuels ignorÈs
+						// g√©rer multiple de 32 bits via z√©ros √©ventuels ignor√©s
 						int complement = (((this->m_iLargeur-1)/4) + 1)*4 - this->m_iLargeur;
 						for (int indice=0;indice<4*256;indice++) 
 							f.read((char*)&this->m_pucPalette[indice],sizeof(char));
@@ -81,7 +81,7 @@ CImageNdg::CImageNdg(const std::string& name) {
 						this->m_bBinaire = false;
 						this->m_sNom.assign(name.begin(),name.end()-4);
 						this->m_pucPalette = new unsigned char[256*4];	
-						this->choixPalette("grise"); // palette grise par dÈfaut
+						this->choixPalette("grise"); // palette grise par d√©faut
 						this->m_pucPixel = new unsigned char[infoHeader.biHeight * infoHeader.biWidth];
 
 						// extraction plan luminance
@@ -146,7 +146,7 @@ void CImageNdg::sauvegarde(const std::string& fixe) {
 	if (this->m_pucPixel) {
 		std::string nomFichier = "../Res/";
 		if (fixe.compare("") == 0)
-			nomFichier += this->lireNom() + ".bmp"; // force sauvegarde dans rÈpertoire Res (doit exister)
+			nomFichier += this->lireNom() + ".bmp"; // force sauvegarde dans r√©pertoire Res (doit exister)
 		else
 			nomFichier += fixe;
 
@@ -185,7 +185,7 @@ void CImageNdg::sauvegarde(const std::string& fixe) {
 				for (int j=0;j<m_iLargeur;j++)    
 					f.write((char*)&this->m_pucPixel[i*m_iLargeur+j],sizeof(char));
 					
-				// gÈrer multiple de 32 bits
+				// g√©rer multiple de 32 bits
 				char inutile;
 				for (int k=0; k< complement; k++)
 					f.write((char*)&inutile,sizeof(char)); 
@@ -225,7 +225,7 @@ CImageNdg& CImageNdg::operator=(const CImageNdg& im) {
 return *this;
 }
 
-// fonctionnalitÈs histogramme 
+// fonctionnalit√©s histogramme 
 
 std::vector<unsigned long> CImageNdg::histogramme(bool enregistrementCSV, int pas) {
 
@@ -282,7 +282,7 @@ MOMENTS CImageNdg::signatures(const std::vector<unsigned long>& h) {
 	}
 	globales.mediane = i;
 
-	// moyenne et Ècart-type
+	// moyenne et √©cart-type
 	double moy=0,sigma=0;
 	for (i=globales.min;i<=globales.max;i++) {
 		moy += ((double)h[i])*i;
@@ -306,7 +306,7 @@ MOMENTS CImageNdg::signatures() {
 	return globales;
 }
 
-// opÈrations ensemblistes images binaires
+// op√©rations ensemblistes images binaires
 CImageNdg CImageNdg::operation(const CImageNdg& im, const std::string& methode) {
 
 	if ((&im == this) || !(this->lireBinaire() && im.lireBinaire())) {
@@ -316,7 +316,7 @@ CImageNdg CImageNdg::operation(const CImageNdg& im, const std::string& methode) 
 	CImageNdg out(this->lireHauteur(), this->lireLargeur());
 	out.m_bBinaire = this->lireBinaire(); 
 	out.m_sNom     = this->lireNom()+"Op";
-	out.choixPalette("binaire"); // palette binaire par dÈfaut pour img binaire
+	out.choixPalette("binaire"); // palette binaire par d√©faut pour img binaire
 
 	if (methode.compare("et") == 0) {
 		for (int i=0;i<this->lireNbPixels();i++)
@@ -361,22 +361,20 @@ CImageNdg CImageNdg::seuillage(const std::string& methode, int& seuilBas, int& s
 	if (!this->m_bBinaire) {
 		CImageNdg out(this->lireHauteur(),this->lireLargeur());
 		out.m_sNom     = this->lireNom()+"S";
-		out.choixPalette("binaire"); // palette binaire par dÈfaut
+		out.choixPalette("binaire"); // palette binaire par d√©faut
 		out.m_bBinaire = true;
-		//seuilBas = 128;
-		//seuilHaut = 255;
 
-		// crÈation lut pour optimisation calcul
+		// cr√©ation lut pour optimisation calcul
 		std::vector<int> lut;
 		lut.resize(256);
 
 		// recherche valeur seuil
-		// cas "manuel" -> seuil reste celui passÈ en paramËtre
+		// cas "manuel" -> seuil reste celui pass√© en param√®tre
 
 		if (methode.compare("automatique") == 0) 
 		{
 			std::vector<unsigned long> hist = this->histogramme();
-			std::vector<unsigned long> histC; // histogramme cumulÈ
+			std::vector<unsigned long> histC; // histogramme cumul√©
 			histC.resize(256,0);
 			histC[0] = hist[0];
 			for (int i=1;i<(int)hist.size();i++) 
@@ -421,7 +419,7 @@ CImageNdg CImageNdg::seuillage(const std::string& methode, int& seuilBas, int& s
 
 		// fin recherche valeur seuil 
 
-		// gÈnÈration lut
+		// g√©n√©ration lut
 		for (int i = 0; i < seuilBas; i++)
 			lut[i] =  0; 
 		for (int i = seuilBas; i <= seuilHaut; i++)
@@ -429,7 +427,7 @@ CImageNdg CImageNdg::seuillage(const std::string& methode, int& seuilBas, int& s
 		for (int i = seuilHaut+1; i <= 255; i++)
 			lut[i] = 0;
 
-		// crÈation image seuillÈe
+		// cr√©ation image seuill√©e
 		std::cout << "Seuillage des pixels entre " << seuilBas << " et " << seuilHaut << std::endl;
 		for (int i=0; i < out.lireNbPixels(); i++) 
 			out(i) = lut[this->operator ()(i)]; 
@@ -454,7 +452,7 @@ CImageNdg CImageNdg::transformation(const std::string& methode,int vMinOut, int 
 	if (methode.compare("complement") == 0) {
 		if (!this->m_bBinaire) {
 			// ndg -> 255-ndg
-			// crÈation lut pour optimisation calcul
+			// cr√©ation lut pour optimisation calcul
 			std::vector<int> lut;
 			lut.resize(256);
 
@@ -779,17 +777,17 @@ double CImageNdg::hausdorffDistance(CImageNdg Image1, CImageNdg Image2)
 	//Segmenter img2 : truth (stocker)
 	CImageClasse im_seg(Image1.seuillage("otsu"), "V8");
 	CImageNdg img_label1 = im_seg.toNdg("expension");
-	// Compter nombre d'ÈlÈment dans img2 : truth
-	// le total d'Èleemnt ‡ trouver est le nombre d'ÈlÈment de img2 : truth
-	// calcul les centre de gravitÈ des Èlements de img2 et de img1
+	// Compter nombre d'√©l√©ment dans img2 : truth
+	// le total d'√©leemnt √† trouver est le nombre d'√©l√©ment de img2 : truth
+	// calcul les centre de gravit√© des √©lements de img2 et de img1
 	std::vector<SIGNATURE_Ndg> sig_img1(img_label1, false);
 	SIGNATURE_COMPOSANTE_CONNEXE* sig_img1 = (SIGNATURE_COMPOSANTE_CONNEXE*)calloc(nbComp_img1 + 1, sizeof(SIGNATURE_COMPOSANTE_CONNEXE));
 	SIGNATURE_COMPOSANTE_CONNEXE* sig_img2 = (SIGNATURE_COMPOSANTE_CONNEXE*)calloc(nbComp_img2 + 1, sizeof(SIGNATURE_COMPOSANTE_CONNEXE));
 	sig_img1 = signaturesImage(labelimg1, nbComp_img1);
 	sig_img2 = signaturesImage(labelimg2, nbComp_img2);
-	// Pour chaque Èlement dans img2
-	//		trouver le centre de gravitÈ dans img1 le plus proche de l'ÈlÈment dans img2
-	//		Associer l'ÈlÈment de img2 avec l'ÈlÈment de img1 le plus proche
+	// Pour chaque √©lement dans img2
+	//		trouver le centre de gravit√© dans img1 le plus proche de l'√©l√©ment dans img2
+	//		Associer l'√©l√©ment de img2 avec l'√©l√©ment de img1 le plus proche
 	double minDistCentre = INFINITY;
 	int* tab_index2to1 = (int*)malloc(nbComp_img2 * sizeof(int));
 	int x_distCentre;
@@ -822,7 +820,7 @@ double CImageNdg::hausdorffDistance(CImageNdg Image1, CImageNdg Image2)
 			for (int x1 = 0; x1 < labelimg1.Nbcol; x1++)
 			{
 				if (labelimg1.pixel[y1][x1] == tab_index2to1[k] + 1) // object 'l'
-				{  // Point de l'ensemble A trouvÈ
+				{  // Point de l'ensemble A trouv√©
 					double minDistB = INFINITY;  // Distance minimale entre un point de A et B
 
 					for (int y2 = 0; y2 < labelimg2.Nblig; y2++)
@@ -830,7 +828,7 @@ double CImageNdg::hausdorffDistance(CImageNdg Image1, CImageNdg Image2)
 						for (int x2 = 0; x2 < labelimg2.Nbcol; x2++)
 						{
 							if (labelimg2.pixel[y2][x2] == k + 1) // object 'k'
-							{  // Point de l'ensemble B trouvÈ
+							{  // Point de l'ensemble B trouv√©
 								double dist = euclideanDistance(x1, y1, x2, y2);
 								if (dist < minDistB)
 								{
@@ -853,7 +851,7 @@ double CImageNdg::hausdorffDistance(CImageNdg Image1, CImageNdg Image2)
 			for (int x2 = 0; x2 < labelimg1.Nbcol; x2++)
 			{
 				if (labelimg2.pixel[y2][x2] == k + 1) //object 'k'
-				{  // Point de l'ensemble B trouvÈ
+				{  // Point de l'ensemble B trouv√©
 					double minDistA = INFINITY;  // Distance minimale entre un point de B et A
 
 					for (int y1 = 0; y1 < labelimg1.Nblig; y1++)
@@ -861,7 +859,7 @@ double CImageNdg::hausdorffDistance(CImageNdg Image1, CImageNdg Image2)
 						for (int x1 = 0; x1 < labelimg1.Nbcol; x1++)
 						{
 							if (labelimg1.pixel[y1][x1] == tab_index2to1[k] + 1) //object 'l'
-							{  // Point de l'ensemble A trouvÈ
+							{  // Point de l'ensemble A trouv√©
 								double dist = euclideanDistance(x2, y2, x1, y1);
 								if (dist < minDistA)
 								{
