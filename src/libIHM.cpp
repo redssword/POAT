@@ -62,18 +62,16 @@ ClibIHM::ClibIHM(bool sc, int nbChamps, byte* data, int stride, int nbLig, int n
 
 	//// SEUILLAGE
 	CImageNdg seuil;
-
+	int seuilBas = 170;
+	int seuilHaut = 255;
 	if (!sc)
 	{
-		int seuilBas = 170;
-		int seuilHaut = 255;
+		
 		seuil = this->imgPt->plan().transformation("complement").tophat("white", "V8").seuillage("", seuilBas, seuilHaut);// .seuillage("automatique", seuilBas, seuilHaut);
 		// .tophat("white", "V8");
 	}
 	else
 	{
-		int seuilBas = 127;
-		int seuilHaut = 255;
 		seuil = this->imgPt->plan().tophat("white", "V8").seuillage("automatique", seuilBas, seuilHaut);
 	}
 	
@@ -100,7 +98,7 @@ ClibIHM::ClibIHM(bool sc, int nbChamps, byte* data, int stride, int nbLig, int n
 		pixPtr += stride; // largeur une seule ligne gestion multiple 32 bits
 	}
 
-	this->dataFromImg.at(0) = this->imgPt->plan().IOU(this->imgPt->plan(), this->imgPt_gt->plan());
+	this->dataFromImg.at(0) = this->imgPt->plan().IOU(this->imgPt->plan().transformation("complement").tophat("white", "V8").seuillage("", seuilBas, seuilHaut), this->imgPt_gt->plan());
 }
 
 
