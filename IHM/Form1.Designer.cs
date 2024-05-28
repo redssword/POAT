@@ -47,6 +47,8 @@
 			this.fichierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.imageUniqueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.dossierDimageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.défilementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.démarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.FBDDir = new System.Windows.Forms.FolderBrowserDialog();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
 			this.lbMoyenneIn = new System.Windows.Forms.Label();
@@ -63,6 +65,7 @@
 			this.pBImgRefIn = new System.Windows.Forms.PictureBox();
 			this.TimerAff = new System.Windows.Forms.Timer(this.components);
 			this.TbAff = new System.Windows.Forms.TrackBar();
+			this.arréterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.pBImgRefSc)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pBVeriteSc)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbResSc)).BeginInit();
@@ -198,7 +201,8 @@
 			// menuStrip1
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fichierToolStripMenuItem});
+            this.fichierToolStripMenuItem,
+            this.défilementToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(1429, 24);
@@ -217,16 +221,32 @@
 			// imageUniqueToolStripMenuItem
 			// 
 			this.imageUniqueToolStripMenuItem.Name = "imageUniqueToolStripMenuItem";
-			this.imageUniqueToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.imageUniqueToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
 			this.imageUniqueToolStripMenuItem.Text = "Image Unique";
 			this.imageUniqueToolStripMenuItem.Click += new System.EventHandler(this.imageUniqueToolStripMenuItem_Click);
 			// 
 			// dossierDimageToolStripMenuItem
 			// 
 			this.dossierDimageToolStripMenuItem.Name = "dossierDimageToolStripMenuItem";
-			this.dossierDimageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.dossierDimageToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
 			this.dossierDimageToolStripMenuItem.Text = "Dossier d\'image";
 			this.dossierDimageToolStripMenuItem.Click += new System.EventHandler(this.dossierDimageToolStripMenuItem_Click);
+			// 
+			// défilementToolStripMenuItem
+			// 
+			this.défilementToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.démarToolStripMenuItem,
+            this.arréterToolStripMenuItem});
+			this.défilementToolStripMenuItem.Name = "défilementToolStripMenuItem";
+			this.défilementToolStripMenuItem.Size = new System.Drawing.Size(77, 20);
+			this.défilementToolStripMenuItem.Text = "Défilement";
+			// 
+			// démarToolStripMenuItem
+			// 
+			this.démarToolStripMenuItem.Name = "démarToolStripMenuItem";
+			this.démarToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.démarToolStripMenuItem.Text = "Démarrer";
+			this.démarToolStripMenuItem.Click += new System.EventHandler(this.démarToolStripMenuItem_Click);
 			// 
 			// lbMoyenneIn
 			// 
@@ -351,6 +371,13 @@
 			this.TbAff.Value = 50;
 			this.TbAff.ValueChanged += new System.EventHandler(this.TbAff_ValueChanged);
 			// 
+			// arréterToolStripMenuItem
+			// 
+			this.arréterToolStripMenuItem.Name = "arréterToolStripMenuItem";
+			this.arréterToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.arréterToolStripMenuItem.Text = "Arréter";
+			this.arréterToolStripMenuItem.Click += new System.EventHandler(this.arréterToolStripMenuItem_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -436,6 +463,9 @@
 		private System.Windows.Forms.PictureBox pBImgRefIn;
 		private System.Windows.Forms.Timer TimerAff;
 		private System.Windows.Forms.TrackBar TbAff;
+		private System.Windows.Forms.ToolStripMenuItem défilementToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem démarToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem arréterToolStripMenuItem;
 	}
 }
 

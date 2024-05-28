@@ -22,6 +22,7 @@ namespace IHM
 {
 	public partial class Form1 : Form
 	{
+		private double score;
 		private int ImAff;
 		private Thread threadIn;
 		private Thread threadSc;
@@ -91,7 +92,6 @@ namespace IHM
 			ImAff = 0;
 
 		}
-		double score;
 
 		private void btnTraitement_Click(object sender, EventArgs e)
 		{
@@ -362,6 +362,16 @@ namespace IHM
 		private void TbAff_ValueChanged(object sender, EventArgs e)
 		{
 			TimerAff.Interval = TbAff.Value;
+		}
+
+		private void démarToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			TimerAff.Start();
+		}
+
+		private void arréterToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			TimerAff.Stop();
 		}
 	}
 }
