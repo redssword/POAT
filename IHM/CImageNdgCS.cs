@@ -72,8 +72,7 @@ namespace Traitement
 		{
 			ClPtr = IntPtr.Zero;
 		}
-
-		~CImageNdgCS()
+        ~CImageNdgCS()
 		{
 			if (ClPtr != IntPtr.Zero)
 				ClPtr = IntPtr.Zero;
