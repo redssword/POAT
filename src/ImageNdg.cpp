@@ -144,7 +144,7 @@ void CImageNdg::sauvegarde(const std::string& fixe) {
 	BITMAPINFOHEADER infoHeader;
 
 	if (this->m_pucPixel) {
-		std::string nomFichier = "../Res/";
+		std::string nomFichier = "../../../data/Res/";
 		if (fixe.compare("") == 0)
 			nomFichier += this->lireNom() + ".bmp"; // force sauvegarde dans répertoire Res (doit exister)
 		else
@@ -764,7 +764,7 @@ double CImageNdg::IOU(CImageNdg Image1, CImageNdg Image2)
 		}
 	}
 
-	iou = round(1000*(float)(inter_area) / union_area);
+	iou = round(100*(float)(inter_area) / union_area);
 	return iou;
 }
 
