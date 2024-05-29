@@ -39,9 +39,7 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.lbResIOUSc = new System.Windows.Forms.Label();
-			this.lbResHausSc = new System.Windows.Forms.Label();
-			this.label6 = new System.Windows.Forms.Label();
-			this.lbMoyenneSc = new System.Windows.Forms.Label();
+			this.lbMoyIOUSc = new System.Windows.Forms.Label();
 			this.ofdImg = new System.Windows.Forms.OpenFileDialog();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.fichierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -49,11 +47,10 @@
 			this.dossierDimageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.défilementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.démarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.arréterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.FBDDir = new System.Windows.Forms.FolderBrowserDialog();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-			this.lbMoyenneIn = new System.Windows.Forms.Label();
-			this.label8 = new System.Windows.Forms.Label();
-			this.lbResHausIn = new System.Windows.Forms.Label();
+			this.lbMoyIOUIn = new System.Windows.Forms.Label();
 			this.lbResIOUIn = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
 			this.label12 = new System.Windows.Forms.Label();
@@ -65,7 +62,6 @@
 			this.pBImgRefIn = new System.Windows.Forms.PictureBox();
 			this.TimerAff = new System.Windows.Forms.Timer(this.components);
 			this.TbAff = new System.Windows.Forms.TrackBar();
-			this.arréterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.pBImgRefSc)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pBVeriteSc)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbResSc)).BeginInit();
@@ -157,9 +153,9 @@
 			this.label5.AutoSize = true;
 			this.label5.Location = new System.Drawing.Point(1129, 176);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(153, 13);
+			this.label5.Size = new System.Drawing.Size(89, 13);
 			this.label5.TabIndex = 8;
-			this.label5.Text = "Résultat distance de Hausdorff";
+			this.label5.Text = "Moyenne IOU Sc";
 			// 
 			// lbResIOUSc
 			// 
@@ -169,30 +165,13 @@
 			this.lbResIOUSc.Size = new System.Drawing.Size(0, 13);
 			this.lbResIOUSc.TabIndex = 9;
 			// 
-			// lbResHausSc
+			// lbMoyIOUSc
 			// 
-			this.lbResHausSc.AutoSize = true;
-			this.lbResHausSc.Location = new System.Drawing.Point(1338, 176);
-			this.lbResHausSc.Name = "lbResHausSc";
-			this.lbResHausSc.Size = new System.Drawing.Size(0, 13);
-			this.lbResHausSc.TabIndex = 10;
-			// 
-			// label6
-			// 
-			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(1129, 233);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(51, 13);
-			this.label6.TabIndex = 11;
-			this.label6.Text = "Moyenne";
-			// 
-			// lbMoyenneSc
-			// 
-			this.lbMoyenneSc.AutoSize = true;
-			this.lbMoyenneSc.Location = new System.Drawing.Point(1338, 233);
-			this.lbMoyenneSc.Name = "lbMoyenneSc";
-			this.lbMoyenneSc.Size = new System.Drawing.Size(0, 13);
-			this.lbMoyenneSc.TabIndex = 12;
+			this.lbMoyIOUSc.AutoSize = true;
+			this.lbMoyIOUSc.Location = new System.Drawing.Point(1338, 176);
+			this.lbMoyIOUSc.Name = "lbMoyIOUSc";
+			this.lbMoyIOUSc.Size = new System.Drawing.Size(0, 13);
+			this.lbMoyIOUSc.TabIndex = 10;
 			// 
 			// ofdImg
 			// 
@@ -244,34 +223,24 @@
 			// démarToolStripMenuItem
 			// 
 			this.démarToolStripMenuItem.Name = "démarToolStripMenuItem";
-			this.démarToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.démarToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
 			this.démarToolStripMenuItem.Text = "Démarrer";
 			this.démarToolStripMenuItem.Click += new System.EventHandler(this.démarToolStripMenuItem_Click);
 			// 
-			// lbMoyenneIn
+			// arréterToolStripMenuItem
 			// 
-			this.lbMoyenneIn.AutoSize = true;
-			this.lbMoyenneIn.Location = new System.Drawing.Point(1338, 632);
-			this.lbMoyenneIn.Name = "lbMoyenneIn";
-			this.lbMoyenneIn.Size = new System.Drawing.Size(0, 13);
-			this.lbMoyenneIn.TabIndex = 27;
+			this.arréterToolStripMenuItem.Name = "arréterToolStripMenuItem";
+			this.arréterToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+			this.arréterToolStripMenuItem.Text = "Arréter";
+			this.arréterToolStripMenuItem.Click += new System.EventHandler(this.arréterToolStripMenuItem_Click);
 			// 
-			// label8
+			// lbMoyIOUIn
 			// 
-			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(1129, 632);
-			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(51, 13);
-			this.label8.TabIndex = 26;
-			this.label8.Text = "Moyenne";
-			// 
-			// lbResHausIn
-			// 
-			this.lbResHausIn.AutoSize = true;
-			this.lbResHausIn.Location = new System.Drawing.Point(1338, 575);
-			this.lbResHausIn.Name = "lbResHausIn";
-			this.lbResHausIn.Size = new System.Drawing.Size(0, 13);
-			this.lbResHausIn.TabIndex = 25;
+			this.lbMoyIOUIn.AutoSize = true;
+			this.lbMoyIOUIn.Location = new System.Drawing.Point(1338, 575);
+			this.lbMoyIOUIn.Name = "lbMoyIOUIn";
+			this.lbMoyIOUIn.Size = new System.Drawing.Size(0, 13);
+			this.lbMoyIOUIn.TabIndex = 25;
 			// 
 			// lbResIOUIn
 			// 
@@ -286,9 +255,9 @@
 			this.label11.AutoSize = true;
 			this.label11.Location = new System.Drawing.Point(1129, 575);
 			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(153, 13);
+			this.label11.Size = new System.Drawing.Size(85, 13);
 			this.label11.TabIndex = 23;
-			this.label11.Text = "Résultat distance de Hausdorff";
+			this.label11.Text = "Moyenne IOU In";
 			// 
 			// label12
 			// 
@@ -371,22 +340,13 @@
 			this.TbAff.Value = 50;
 			this.TbAff.ValueChanged += new System.EventHandler(this.TbAff_ValueChanged);
 			// 
-			// arréterToolStripMenuItem
-			// 
-			this.arréterToolStripMenuItem.Name = "arréterToolStripMenuItem";
-			this.arréterToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.arréterToolStripMenuItem.Text = "Arréter";
-			this.arréterToolStripMenuItem.Click += new System.EventHandler(this.arréterToolStripMenuItem_Click);
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1429, 761);
 			this.Controls.Add(this.TbAff);
-			this.Controls.Add(this.lbMoyenneIn);
-			this.Controls.Add(this.label8);
-			this.Controls.Add(this.lbResHausIn);
+			this.Controls.Add(this.lbMoyIOUIn);
 			this.Controls.Add(this.lbResIOUIn);
 			this.Controls.Add(this.label11);
 			this.Controls.Add(this.label12);
@@ -396,9 +356,7 @@
 			this.Controls.Add(this.pBVeriteIn);
 			this.Controls.Add(this.label15);
 			this.Controls.Add(this.pBImgRefIn);
-			this.Controls.Add(this.lbMoyenneSc);
-			this.Controls.Add(this.label6);
-			this.Controls.Add(this.lbResHausSc);
+			this.Controls.Add(this.lbMoyIOUSc);
 			this.Controls.Add(this.lbResIOUSc);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.label4);
@@ -439,9 +397,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lbResIOUSc;
-        private System.Windows.Forms.Label lbResHausSc;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label lbMoyenneSc;
+        private System.Windows.Forms.Label lbMoyIOUSc;
         private System.Windows.Forms.OpenFileDialog ofdImg;
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ToolStripMenuItem fichierToolStripMenuItem;
@@ -449,9 +405,7 @@
 		private System.Windows.Forms.ToolStripMenuItem dossierDimageToolStripMenuItem;
 		private System.Windows.Forms.FolderBrowserDialog FBDDir;
 		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
-		private System.Windows.Forms.Label lbMoyenneIn;
-		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.Label lbResHausIn;
+		private System.Windows.Forms.Label lbMoyIOUIn;
 		private System.Windows.Forms.Label lbResIOUIn;
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.Label label12;
