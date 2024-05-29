@@ -66,19 +66,23 @@ namespace IHM
 			else lbl.Text = res;
 		}
 
-
+		private delegate void enablebt(Button button);
+		private void EnableBt(Button button)
+		{
+			if(button.InvokeRequired)
+			{
+				enablebt d;
+				d = new enablebt(EnableBt);
+				this.Invoke(d, new object[] { button });				
+			}
+			else button.Enabled = true;
+		}
 
 		public Form1()
 		{
 			InitializeComponent();
 			EV_Sc = new AutoResetEvent(false);
 			EV_In = new AutoResetEvent(false);
-
-			threadIn = new Thread(new ThreadStart(TraitmentImgIn));
-			threadSc = new Thread(new ThreadStart(TraitmentImgSc));
-			threadRes = new Thread(new ThreadStart(ResCsv));
-
-			threadRes.Start();
 
 			FilesImg = new List<string>();
 			FilesGT = new List<string>();
@@ -95,8 +99,14 @@ namespace IHM
 
 		private void btnTraitement_Click(object sender, EventArgs e)
 		{
+			threadIn = new Thread(new ThreadStart(TraitmentImgIn));
+			threadSc = new Thread(new ThreadStart(TraitmentImgSc));
+			threadRes = new Thread(new ThreadStart(ResCsv));
+
 			threadIn.Start();
 			threadSc.Start();
+			threadRes.Start();
+			btnTraitement.Enabled = false;
 		}
 
 		private void imageUniqueToolStripMenuItem_Click(object sender, EventArgs e)
@@ -105,6 +115,7 @@ namespace IHM
 			{
 				if (ofdImg.FileName.EndsWith(".bmp"))
 				{
+
 					FilesImg.Clear();
 					FilesImgSc.Clear();
 					FilesGTSc.Clear();
@@ -187,11 +198,14 @@ namespace IHM
 
 		private void TraitmentImgSc()
 		{
+			double Moy = 0;
+			Bitmap bmpImSc;
+			Bitmap bmpGtIn;
 			for (int i = 0; i < FilesImgSc.Count(); i++)
 			{
 				string res = $"Sc_{i + 1};";
-				var bmpImSc = new Bitmap(FilesImgSc[i]);
-				var bmpGtIn = new Bitmap(FilesGTSc[i]);
+				bmpImSc = new Bitmap(FilesImgSc[i]);
+				bmpGtIn = new Bitmap(FilesGTSc[i]);
 
 				CImageNdgCS Img = new CImageNdgCS();
 				unsafe
@@ -205,19 +219,27 @@ namespace IHM
 					bmpGtIn.UnlockBits(bmpdataGt);
 					score = Img.objetLibValeurChamp(0);
 				}
-				res += score + "; Hausdorf; moyenne des 2 ";
+				Moy += score;
+				res += score;
 				resSc.Add(res);
 			}
+			Moy /= FilesImgSc.Count();
+			AfficherScore(lbMoyIOUSc, Moy.ToString("0.##"));
+			resSc.Add($"Moyenne score IOU; {Moy}");
+
 			EV_Sc.Set();
 		}
 
 		private void TraitmentImgIn()
 		{
+			double Moy = 0;
+			Bitmap bmpImSc;
+			Bitmap bmpGtIn;
 			for (int i = 0; i < FilesImgIn.Count(); i++)
 			{
 				string res = $"In_{i + 1};";
-				var bmpImSc = new Bitmap(FilesImgIn[i]);
-				var bmpGtIn = new Bitmap(FilesGTIn[i]);
+				bmpImSc = new Bitmap(FilesImgIn[i]);
+				bmpGtIn = new Bitmap(FilesGTIn[i]);
 
 				CImageNdgCS Img = new CImageNdgCS();
 				unsafe
@@ -231,15 +253,19 @@ namespace IHM
 					bmpGtIn.UnlockBits(bmpdataGt);
 					score = Img.objetLibValeurChamp(0);
 				}
-				res += score + "; Hausdorf; moyenne des 2 ";
+				Moy += score;
+				res += score;
 				resIn.Add(res);
 			}
+			Moy /= FilesImgIn.Count();
+			AfficherScore(lbMoyIOUIn, Moy.ToString("0.##"));
+			resIn.Add($"Moyenne score IOU; {Moy}");
+
 			EV_In.Set();
 		}
 
 		private void ResCsv()
 		{
-
 			while (!EV_In.WaitOne() && !EV_Sc.WaitOne()) ;
 			string csvSc = "ResultatSc.csv";
 			File.WriteAllLines(csvSc, resSc);
@@ -247,6 +273,9 @@ namespace IHM
 			File.WriteAllLines(csvIn, resIn);
 			resIn.Clear();
 			resSc.Clear();
+			EV_In.Reset();
+			EV_Sc.Reset();
+			EnableBt(btnTraitement);
 		}
 
 		private void TimerAff_Tick(object sender, EventArgs e)
@@ -254,7 +283,7 @@ namespace IHM
 			TimerAff.Stop();
 			if (ImAff == 300)
 				ImAff = 0;
-
+			bool secu = true;
 			if (FilesImgSc.Count > 1)
 			{
 				var ImgOrigine = new Bitmap(FilesImgSc[ImAff]);
@@ -270,7 +299,7 @@ namespace IHM
 					BitmapData bmpdataGt = bmpGt.LockBits(new Rectangle(0, 0, bmpGt.Width, bmpGt.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
 
 					Img.objetLibDataImgPtr(true, 1, bmpData.Scan0, bmpData.Stride, bmpIm.Height, bmpIm.Width,
-										         1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
+												 1, bmpdataGt.Scan0, bmpdataGt.Stride, bmpdataGt.Height, bmpdataGt.Width);
 					bmpIm.UnlockBits(bmpData);
 					bmpGt.UnlockBits(bmpdataGt);
 					score = Img.objetLibValeurChamp(0);
@@ -278,7 +307,7 @@ namespace IHM
 				AfficherResultat(pbResSc, bmpIm);
 				AfficherScore(lbResIOUSc, score.ToString());
 			}
-			
+
 			else if (FilesImgSc.Count == 1)
 			{
 				var ImgOrigine = new Bitmap(FilesImgSc[0]);
@@ -301,6 +330,7 @@ namespace IHM
 				}
 				AfficherResultat(pbResSc, bmpIm);
 				AfficherScore(lbResIOUSc, score.ToString());
+				secu = false;
 			}
 
 			if (FilesImgIn.Count > 1)
@@ -352,11 +382,12 @@ namespace IHM
 				}
 				AfficherResultat(pbResIN, bmpImIn);
 				AfficherScore(lbResIOUIn, score.ToString());
+				secu = false;
 			}
 
 			ImAff++;
-
-			TimerAff.Start();
+			if (secu)
+				TimerAff.Start();
 		}
 
 		private void TbAff_ValueChanged(object sender, EventArgs e)
