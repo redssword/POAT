@@ -2,10 +2,13 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <windows.h>
 #include <cmath>
 #include <vector>
 
 #include "ImageCouleur.h"
+
+#define MAGIC_NUMBER_BMP ('B'+('M'<<8)) // signature bitmap windows
 
 // constructeurs et destructeur
 CImageCouleur::CImageCouleur() {
@@ -39,33 +42,18 @@ CImageCouleur::CImageCouleur(int hauteur, int largeur, int valR, int valV, int v
 			this->m_ppucPixel[i][2] = valB;
 }
 
-CImageCouleur::CImageCouleur(const std::string name) {
+CImageCouleur::CImageCouleur(const std::string& name) {
 
 	BITMAPFILEHEADER header;
 	BITMAPINFOHEADER infoHeader;
-
-
+	
 	std::ifstream f(name.c_str(),std::ios::in | std::ios::binary); // transformation d'une string en chaîne de type C
 	if (f.is_open()) {
-			f.read((char*)&header.bfType, 2);
-			f.read((char*)&header.bfSize, 4);
-			f.read((char*)&header.bfReserved1, 2);
-			f.read((char*)&header.bfReserved2, 2);
-			f.read((char*)&header.bfOffBits, 4);
-			if (header.bfType != MAGIC_NUMBER_BMP)
-				throw std::string("ouverture format BMP impossible ...");
-			else {
-				f.read((char*)&infoHeader.biSize, 4);
-				f.read((char*)&infoHeader.biWidth, 4);
-				f.read((char*)&infoHeader.biHeight, 4);
-				f.read((char*)&infoHeader.biPlanes, 2);
-				f.read((char*)&infoHeader.biBitCount, 2);
-				f.read((char*)&infoHeader.biCompression, 4);
-				f.read((char*)&infoHeader.biSizeImage, 4);
-				f.read((char*)&infoHeader.biXPelsPerMeter, 4);
-				f.read((char*)&infoHeader.biYPelsPerMeter, 4);
-				f.read((char*)&infoHeader.biClrUsed, 4);
-				f.read((char*)&infoHeader.biClrImportant, 4);
+		f.read((char*)&header,sizeof(BITMAPFILEHEADER));
+		if (header.bfType != MAGIC_NUMBER_BMP) 
+			throw std::string("ouverture format BMP impossible ..."); 
+		else {
+			f.read((char*)&infoHeader,sizeof(BITMAPINFOHEADER));
 			if (infoHeader.biCompression > 0) 
 				throw std::string("Format compresse non supporté...");
 			else {
@@ -75,7 +63,7 @@ CImageCouleur::CImageCouleur(const std::string name) {
 					this->m_sNom.assign(name.begin(),name.end()-4);
 					this->m_pucData = new unsigned char[infoHeader.biHeight*infoHeader.biWidth*3];
 					this->m_ppucPixel = new unsigned char*[infoHeader.biHeight*infoHeader.biWidth];
-					for (int i=0;i<(int)(infoHeader.biHeight*infoHeader.biWidth);i++)
+					for (int i=0;i<infoHeader.biHeight*infoHeader.biWidth;i++)
 						this->m_ppucPixel[i] = &this->m_pucData[3*i];
 
 					// gérer multiple de 32 bits via zéros éventuels ignorés
@@ -100,7 +88,7 @@ CImageCouleur::CImageCouleur(const std::string name) {
 					this->m_sNom.assign(name.begin(),name.end()-4);
 					this->m_pucData = new unsigned char[infoHeader.biHeight*infoHeader.biWidth*3];
 					this->m_ppucPixel = new unsigned char*[infoHeader.biHeight*infoHeader.biWidth];
-					for (int i=0;i<(int)(infoHeader.biHeight*infoHeader.biWidth);i++)
+					for (int i=0;i<infoHeader.biHeight*infoHeader.biWidth;i++)
 						this->m_ppucPixel[i] = &this->m_pucData[3*i];
 
 					// lecture palette
@@ -131,14 +119,14 @@ CImageCouleur::CImageCouleur(const std::string name) {
 		f.close();
 	}
 	else
-		throw std::string("ERREUR : Image absente (ou pas ici en tout cas) !");
+		throw std::string("Ouverture impossible !");
 }
 
 CImageCouleur::CImageCouleur(const CImageCouleur& im) {
 
 	this->m_iHauteur = im.lireHauteur();
 	this->m_iLargeur = im.lireLargeur();
-	this->m_sNom     = im.lireNom()+"Copie";
+	this->m_sNom     = im.lireNom();
 	this->m_pucData = NULL;
 	this->m_ppucPixel = NULL;
 
@@ -152,111 +140,6 @@ CImageCouleur::CImageCouleur(const CImageCouleur& im) {
 		}
 }
 
-CImageCouleur::CImageCouleur(const CImageNdg& im) {
-
-	this->m_iHauteur = im.lireHauteur();
-	this->m_iLargeur = im.lireLargeur();
-	this->m_sNom = im.lireNom()+"RGB";
-	this->m_pucData = NULL;
-	this->m_ppucPixel = NULL;
-
-	if (im.lireNbPixels() > 0) {
-		this->m_pucData = new unsigned char[im.lireHauteur()*im.lireLargeur() * 3];
-		this->m_ppucPixel = new unsigned char*[im.lireHauteur()*im.lireLargeur()];
-		for (int i = 0; i<im.lireHauteur()*im.lireLargeur(); i++)
-			this->m_ppucPixel[i] = &this->m_pucData[3 * i];
-
-		for (int i = 0; i < im.lireNbPixels(); i++)
-			this->operator()(i)[0] = this->operator()(i)[1] = this->operator()(i)[2] = im(i);
-	}
-}
-
-CImageCouleur::CImageCouleur(const CImageNdg& pR, const CImageNdg& pG, const CImageNdg& pB) {
-
-	this->m_iHauteur = pR.lireHauteur();
-	this->m_iLargeur = pR.lireLargeur();
-	this->m_sNom = pR.lireNom() + "RGB";
-	this->m_pucData = NULL;
-	this->m_ppucPixel = NULL;
-
-	if (pR.lireNbPixels() > 0) {
-		this->m_pucData = new unsigned char[pR.lireHauteur()*pR.lireLargeur() * 3];
-		this->m_ppucPixel = new unsigned char*[pR.lireHauteur()*pR.lireLargeur()];
-		for (int i = 0; i<pR.lireHauteur()*pR.lireLargeur(); i++)
-			this->m_ppucPixel[i] = &this->m_pucData[3 * i];
-
-		for (int i = 0; i < pR.lireNbPixels(); i++)
-		{
-			this->operator()(i)[0] = pR(i);
-			this->operator()(i)[1] = pG(i);
-			this->operator()(i)[2] = pB(i);
-		}
-	}
-}
-
-// masquage avec image binaire (exemple des contours)
-CImageCouleur::CImageCouleur(const CImageNdg& im, const CImageNdg& mask, int R, int G, int B)
-{
-	this->m_iHauteur = im.lireHauteur();
-	this->m_iLargeur = im.lireLargeur();
-	this->m_sNom = im.lireNom() + "Mask";
-	this->m_pucData = NULL;
-	this->m_ppucPixel = NULL;
-
-	if (im.lireNbPixels() > 0) {
-		this->m_pucData = new unsigned char[im.lireHauteur()*im.lireLargeur() * 3];
-		this->m_ppucPixel = new unsigned char*[im.lireHauteur()*im.lireLargeur()];
-		for (int i = 0; i<im.lireHauteur()*im.lireLargeur(); i++)
-			this->m_ppucPixel[i] = &this->m_pucData[3 * i];
-
-		for (int i = 0; i < im.lireNbPixels(); i++)
-			if (mask(i) == 0)
-			{
-				this->operator()(i)[0] = im(i);
-				this->operator()(i)[1] = im(i);
-				this->operator()(i)[2] = im(i);
-			}
-			else
-			{
-				this->operator()(i)[0] = R;
-				this->operator()(i)[1] = G;
-				this->operator()(i)[2] = B;
-			}
-	}
-}
-
-// masquage avec image binaire (exemple des contours)
-CImageCouleur::CImageCouleur(const CImageCouleur& im, const CImageNdg& mask, int R, int G, int B)
-{
-	this->m_iHauteur = im.lireHauteur();
-	this->m_iLargeur = im.lireLargeur();
-	this->m_sNom = im.lireNom() + "Mask";
-	this->m_pucData = NULL;
-	this->m_ppucPixel = NULL;
-
-	if (im.lireNbPixels() > 0) {
-		this->m_pucData = new unsigned char[im.lireHauteur()*im.lireLargeur() * 3];
-		this->m_ppucPixel = new unsigned char*[im.lireHauteur()*im.lireLargeur()];
-		for (int i = 0; i<im.lireHauteur()*im.lireLargeur(); i++)
-			this->m_ppucPixel[i] = &this->m_pucData[3 * i];
-
-		for (int i = 0; i < im.lireNbPixels(); i++)
-			if (mask(i) == 0)
-			{
-				this->operator()(i)[0] = im(i)[0];
-				this->operator()(i)[1] = im(i)[1];
-				this->operator()(i)[2] = im(i)[2];
-			}
-			else
-			{
-				this->operator()(i)[0] = R;
-				this->operator()(i)[1] = G;
-				this->operator()(i)[2] = B;
-			}
-	}
-}
-
-
 CImageCouleur::~CImageCouleur() {
 
 	if (this->m_ppucPixel) {
@@ -269,56 +152,42 @@ CImageCouleur::~CImageCouleur() {
 	}
 }
 
-void CImageCouleur::sauvegarde(const std::string file) {
+void CImageCouleur::sauvegarde(const std::string& fixe) {
 
 	BITMAPFILEHEADER header;
 	BITMAPINFOHEADER infoHeader;
 
 	if (this->m_ppucPixel) {
-		std::string nomFichier = "res/"; // force sauvegarde dans répertoire res (doit exister)
-
-		if (file.empty())
-			nomFichier += this->lireNom() + ".bmp"; 
+		std::string nomFichier = "../Res/";
+		if (fixe.compare("") == 0)
+			nomFichier += this->lireNom() + ".bmp"; // force sauvegarde dans répertoire Res (doit exister)
 		else
-			nomFichier += file + ".bmp";
-
+			nomFichier += fixe;
 		std::ofstream f(nomFichier.c_str(),std::ios::binary);
 		if (f.is_open()) {
 			int complement = (((this->m_iLargeur*3-1)/4) + 1)*4 - this->m_iLargeur*3;
 
+			header.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER); 
+			header.bfSize = header.bfOffBits + (complement+lireLargeur())*lireHauteur()*sizeof(char);
 			header.bfType = MAGIC_NUMBER_BMP;
-			f.write((char*)&header.bfType, 2);
-			header.bfOffBits = 14 * sizeof(char) + 40 * sizeof(char);
-			header.bfSize = header.bfOffBits + (complement + lireLargeur())*lireHauteur()*sizeof(char);
-			f.write((char*)&header.bfSize, 4);
 			header.bfReserved1 = 0;
-			f.write((char*)&header.bfReserved1, 2);
 			header.bfReserved2 = 0;
-			f.write((char*)&header.bfReserved2, 2);
-			f.write((char*)&header.bfOffBits, 4);
-
-			infoHeader.biSize = 40 * sizeof(char);
-			f.write((char*)&infoHeader.biSize, 4);
-			infoHeader.biWidth = this->m_iLargeur;
-			f.write((char*)&infoHeader.biWidth, 4);
-			infoHeader.biHeight = this->m_iHauteur;
-			f.write((char*)&infoHeader.biHeight, 4);
-			infoHeader.biPlanes = 3;
-			f.write((char*)&infoHeader.biPlanes, 2);
-			infoHeader.biBitCount = 24;
-			f.write((char*)&infoHeader.biBitCount, 2);
-			infoHeader.biCompression = 0; // pas de compression
-			f.write((char*)&infoHeader.biCompression, 4);
-			infoHeader.biSizeImage = this->lireNbPixels()*3;
-			f.write((char*)&infoHeader.biSizeImage, 4);
-			infoHeader.biXPelsPerMeter = 0;
-			f.write((char*)&infoHeader.biXPelsPerMeter, 4);
-			infoHeader.biYPelsPerMeter = 0;
-			f.write((char*)&infoHeader.biYPelsPerMeter, 4);
+			f.write((char*)&header,sizeof(BITMAPFILEHEADER));
+			
+			infoHeader.biHeight = this->lireHauteur();
+			infoHeader.biWidth = this->lireLargeur();
+			infoHeader.biCompression = 0;
 			infoHeader.biClrUsed = 0;
-			f.write((char*)&infoHeader.biClrUsed, 4);
+			infoHeader.biBitCount = 24;
+			infoHeader.biSizeImage = 0; //pas de compression;
+			infoHeader.biClrUsed = 0;
 			infoHeader.biClrImportant = 0;
-			f.write((char*)&infoHeader.biClrImportant, 4);
+			infoHeader.biHeight = this->lireHauteur();
+			infoHeader.biWidth = this->lireLargeur();
+			infoHeader.biPlanes = 1;
+			infoHeader.biSize = sizeof(infoHeader);
+			infoHeader.biSizeImage = this->lireNbPixels();
+			f.write((char*)&infoHeader,sizeof(BITMAPINFOHEADER));
 
 			for (int i= this->lireHauteur()-1; i >= 0; i--) {
 				for (int j=0;j<this->lireLargeur();j++) {
@@ -364,27 +233,30 @@ CImageCouleur& CImageCouleur::operator=(const CImageCouleur& im) {
 return *this;
 }
 
-// histogramme  couleur, plan par plan
-// organisé en vecteur progressif à savoir 3*i -> R ou H,3*i+1 -> G ou S et 3*i+2 -> B ou V
-std::vector<unsigned long> CImageCouleur::histogramme(bool enregistrementCSV) {
-	std::vector<unsigned long> h;
+// histogramme 
 
-	h.resize(3*256); // 3 plans 
+std::vector<std::vector<unsigned long>> CImageCouleur::histogramme(bool enregistrementCSV, int pas) {
+
+	std::vector<std::vector<unsigned long>> h;
+
+	h.resize(3); // 3 plans 
+	for (int plan=0;plan<3;plan++) 
+		h[plan].resize(256/pas,0);
 
 	for (int i=0;i<this->lireNbPixels();i++) { 
-		h[3*this->operator()(i)[0]] += 1L;
-		h[3*this->operator()(i)[1]+1] += 1L;
-		h[3*this->operator()(i)[2]+2] += 1L;
+		h[0][this->operator()(i)[0]/pas] += 1L;
+		h[1][this->operator()(i)[1]/pas] += 1L;
+		h[2][this->operator()(i)[2]/pas] += 1L;
 	}
 	if (enregistrementCSV) {
-		std::string fichier = "res/" + this->lireNom() + ".csv";
+		std::string fichier = "../Res/" + this->lireNom() + ".csv";
 		std::ofstream f (fichier.c_str());
 
 		if (!f.is_open())
 			std::cout << "Impossible d'ouvrir le fichier en ecriture !" << std::endl;
 		else {
-			for (int i=0;i<256;i++)
-				f << h[3*i] << " ; " << h[3*i+1] << " ; " << h[3*i+2] << " ; " << std::endl;
+			for (int i=0;i<(int)h[0].size();i++)
+				f << h[0][i] << " ; " << h[1][i] << " ; " << h[2][i] << " ; " << std::endl;
 		}
 		f.close();
 	}
@@ -392,10 +264,14 @@ std::vector<unsigned long> CImageCouleur::histogramme(bool enregistrementCSV) {
 	return h;
 }
 
+
 // gestion des plans
-CImageNdg CImageCouleur::plan(int choix, double poidsRouge, double poidsVert, double poidsBleu) { // 0 -> R ou H, 1 -> V ou S, 2 -> B ou V et 3 -> luminance d'où les poids fct de l'illuminant
+CImageNdg CImageCouleur::plan(int choix, float poidsRouge, float poidsVert, float poidsBleu) { // 0 -> R ou H, 1 -> V ou S, 2 -> B ou V et 3 -> luminance d'où les poids fct de l'illuminant
+	
 	CImageNdg out(this->lireHauteur(),this->lireLargeur());
-	out.ecrireNom(this->lireNom() + std::to_string(choix));
+	std::stringstream convert;
+	convert << choix;
+	out.ecrireNom(this->lireNom() + convert.str());
 	out.choixPalette("grise"); // par défaut
 	out.ecrireBinaire(false);
 
@@ -414,12 +290,11 @@ CImageNdg CImageCouleur::plan(int choix, double poidsRouge, double poidsVert, do
 		break;
 	case 3: 
 		for (int i=0;i<this->lireNbPixels();i++)
-			out(i) = (unsigned char)(poidsRouge*(double)this->operator()(i)[0] + poidsVert*(double)this->operator()(i)[1] + poidsBleu*(double)this->operator()(i)[2]);
+			out(i) = (unsigned char)(poidsRouge*(float)this->operator()(i)[0] + poidsVert*(float)this->operator()(i)[1] + poidsBleu*(float)this->operator()(i)[2]);
 	}
 	return out;
 }
 
-// mise à jour d'un plan particulier défini par une image en Ndg et 0,1 ou 2
 CImageCouleur& CImageCouleur::miseAJourPlan(int choix, const CImageNdg& plan) {
 
 	for (int i=0;i<this->lireNbPixels();i++)
@@ -428,8 +303,10 @@ CImageCouleur& CImageCouleur::miseAJourPlan(int choix, const CImageNdg& plan) {
 		return *this;
 }
 
+
 // conversion espace HSV sur [0-255] pour chaque plan
-CImageCouleur CImageCouleur::conversion(const std::string methode) const {
+
+CImageCouleur CImageCouleur::conversion(const std::string& methode) const {
 
 	CImageCouleur out(this->lireHauteur(),this->lireLargeur(),0,0,0);
 	out.ecrireNom(this->lireNom() + "HSV");
@@ -463,41 +340,57 @@ CImageCouleur CImageCouleur::conversion(const std::string methode) const {
 	return out;
 }
 
-// transformation
-CImageCouleur CImageCouleur::transformation(const std::string methode) {
+CImageCouleur CImageCouleur::transformation(const std::string& methode, int vMin, int vMax) {
 
-	CImageCouleur out(this->lireHauteur(), this->lireLargeur());
+	CImageCouleur out(this->lireHauteur(),this->lireLargeur());
+	out.m_sNom     = this->lireNom()+"T";
 
-	if (methode.compare("complement") == 0) {
-		out.m_sNom = this->lireNom() + "TComp";
-		CImageNdg planR = this->plan(0).transformation("complement");
-		CImageNdg planG = this->plan(1).transformation("complement");
-		CImageNdg planB = this->plan(2).transformation("complement");
-		out.miseAJourPlan(0, planR);
-		out.miseAJourPlan(1, planG);
-		out.miseAJourPlan(2, planB);
-	}
-	else
-		if (methode.compare("expansion") == 0) {
-			out.m_sNom = this->lireNom() + "TExp";
-			CImageNdg planR = this->plan(0).transformation("expansion");
-			CImageNdg planG = this->plan(1).transformation("expansion");
-			CImageNdg planB = this->plan(2).transformation("expansion");
-			out.miseAJourPlan(0, planR);
-			out.miseAJourPlan(1, planG);
-			out.miseAJourPlan(2, planB);
+	if (methode.compare("expansion") == 0) {
+		CImageNdg pR = this->plan(0);
+		CImageNdg pG = this->plan(1);
+		CImageNdg pB = this->plan(2);
+
+		pR = pR.transformation("expansion",vMin,vMax);
+		pG = pG.transformation("expansion",vMin,vMax);
+		pB = pB.transformation("expansion",vMin,vMax);
+
+		out.miseAJourPlan(0,pR);
+		out.miseAJourPlan(1,pG);
+		out.miseAJourPlan(2,pB);
 		}
 		else
 			if (methode.compare("egalisation") == 0) {
-				out.m_sNom = this->lireNom() + "TEga";
-				CImageNdg planR = this->plan(0).transformation("egalisation");
-				CImageNdg planG = this->plan(1).transformation("egalisation");
-				CImageNdg planB = this->plan(2).transformation("egalisation");
-				out.miseAJourPlan(0, planR);
-				out.miseAJourPlan(1, planG);
-				out.miseAJourPlan(2, planB);
+				CImageNdg pR = this->plan(0);
+				CImageNdg pG = this->plan(1);
+				CImageNdg pB = this->plan(2);
+
+				pR = pR.transformation("egalisation");
+				pG = pG.transformation("egalisation");
+				pB = pB.transformation("egalisation");
+
+				out.miseAJourPlan(0,pR);
+				out.miseAJourPlan(1,pG);
+				out.miseAJourPlan(2,pB);
 			}
+
 	return out;
 }
 
+std::vector<MOMENTS> CImageCouleur::signatures()
+{
+	std::vector<MOMENTS> mts;
 
+	mts.resize(3);
+
+	for (int plan = 0; plan < 3; plan++)
+	{
+		CImageNdg p = this->plan(plan);
+
+		std::vector<unsigned long> hist;
+		hist = p.histogramme();
+
+		mts.at(plan) = p.signatures(hist);
+	}
+
+	return mts;
+}
